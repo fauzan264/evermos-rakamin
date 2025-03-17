@@ -1,0 +1,82 @@
+package handlers
+
+import (
+	"net/http"
+
+	"github.com/fauzan264/evermos-rakamin/constants"
+	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
+	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
+	"github.com/fauzan264/evermos-rakamin/helpers"
+	"github.com/fauzan264/evermos-rakamin/services"
+	"github.com/gofiber/fiber/v2"
+)
+
+type authHandler struct {
+	authService services.AuthService
+}
+
+func NewAuthHandler(authService services.AuthService) *authHandler {
+	return &authHandler{authService}
+}
+
+func (h *authHandler) RegisterUser(c *fiber.Ctx) error {
+	var request request.RegisterRequest
+
+	err := c.BodyParser(&request)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+
+	err = h.authService.RegisterUser(request)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessGetData,
+		Errors: nil,
+		Data: "Register Succeed",
+	})
+}
+
+func (h *authHandler) LoginUser(c *fiber.Ctx) error {
+	var request request.LoginRequest
+
+	err := c.BodyParser(&request)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+
+	loginUser, err := h.authService.LoginUser(request)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessGetData,
+		Errors: nil,
+		Data: loginUser,
+	})
+}
