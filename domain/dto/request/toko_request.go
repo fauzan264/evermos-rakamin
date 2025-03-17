@@ -1,4 +1,4 @@
-package dto
+package request
 
 type UpdateProfileShopRequest struct {
 	Nama			string		`form:"nama" validate:"required"`

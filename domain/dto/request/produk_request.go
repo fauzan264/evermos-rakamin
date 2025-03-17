@@ -1,4 +1,4 @@
-package dto
+package request
 
 type CreateProductRequest struct {
 	NamaProduk			string				`form:"nama_produk" validate:"required"`

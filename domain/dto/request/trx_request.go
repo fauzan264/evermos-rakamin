@@ -1,4 +1,4 @@
-package dto
+package request
 
 type CreateTrxRequest struct {
 	MethodBayar			string				`json:"method_bayar" binding:"required"`

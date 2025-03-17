@@ -1,4 +1,4 @@
-package dto
+package request
 
 type ShippingAddressRequest struct {
 	JudulAlamat		string 	`json:"judul_alamat" validate:"required"`
