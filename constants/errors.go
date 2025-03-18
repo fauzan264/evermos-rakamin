@@ -12,3 +12,11 @@ var (
 	ErrUnauthorized = errors.New("Unauthorized")
 	ErrInvalidDateFormat = errors.New("Invalid date format. Use DD/MM/YYYY")
 )
+
+// province city repository
+var (
+	ErrFailedFetchListProvince = errors.New("failed to fetch provinces")
+	ErrFailedFetchListCity = errors.New("failed to fetch cities")
+	ErrFailedFetchDetailProvince = errors.New("failed to fetch detail province")
+	ErrFailedFetchDetailCity = errors.New("failed to fetch city")
+)
