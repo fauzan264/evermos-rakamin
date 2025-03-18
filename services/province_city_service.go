@@ -1,6 +1,8 @@
 package services
 
 import (
+	"strconv"
+
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
 	"github.com/fauzan264/evermos-rakamin/repositories"
@@ -32,7 +34,8 @@ func (s *provinceCityService) GetListProvince() ([]response.ProvinceResponse, er
 }
 
 func (s *provinceCityService) GetDetailProvince(request request.GetByProvinceIDRequest) (response.ProvinceResponse, error) {
-	getProvince, err := s.repository.GetDetailProvince(request.ID)
+	provinceID := strconv.Itoa(request.ProvinceID)
+	getProvince, err := s.repository.GetDetailProvince(provinceID)
 	if err != nil {
 		return getProvince, err
 	}
@@ -41,7 +44,8 @@ func (s *provinceCityService) GetDetailProvince(request request.GetByProvinceIDR
 }
 
 func (s *provinceCityService) GetListCity(request request.GetByProvinceIDRequest) ([]response.CityResponse, error) {
-	getListCity, err := s.repository.GetListCity(request.ID)
+	provinceID := strconv.Itoa(request.ProvinceID)
+	getListCity, err := s.repository.GetListCity(provinceID)
 	if err != nil {
 		return getListCity, err
 	}
@@ -50,7 +54,8 @@ func (s *provinceCityService) GetListCity(request request.GetByProvinceIDRequest
 }
 
 func (s *provinceCityService) GetDetailCity(request request.GetByCityIDRequest) (response.CityResponse, error) {
-	getCity, err := s.repository.GetDetailCity(request.ID)
+	cityID := strconv.Itoa(request.CityID)
+	getCity, err := s.repository.GetDetailCity(cityID)
 	if err != nil {
 		return getCity, err
 	}
