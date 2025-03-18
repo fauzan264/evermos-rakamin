@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/fauzan264/evermos-rakamin/constants"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
@@ -24,7 +22,7 @@ func (h *authHandler) RegisterUser(c *fiber.Ctx) error {
 
 	err := c.BodyParser(&request)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.Response{
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedInsertData,
 			Errors: helpers.FormatValidationError(err),
@@ -34,7 +32,7 @@ func (h *authHandler) RegisterUser(c *fiber.Ctx) error {
 
 	err = h.authService.RegisterUser(request)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.Response{
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedInsertData,
 			Errors: []string{err.Error()},
@@ -42,7 +40,7 @@ func (h *authHandler) RegisterUser(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(http.StatusOK).JSON(response.Response{
+	return c.Status(fiber.StatusOK).JSON(response.Response{
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
@@ -55,7 +53,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 
 	err := c.BodyParser(&request)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.Response{
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedInsertData,
 			Errors: helpers.FormatValidationError(err),
@@ -65,7 +63,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 
 	loginUser, err := h.authService.LoginUser(request)
 	if err != nil {
-		return c.Status(http.StatusUnauthorized).JSON(response.Response{
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedInsertData,
 			Errors: []string{err.Error()},
@@ -73,7 +71,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(http.StatusOK).JSON(response.Response{
+	return c.Status(fiber.StatusOK).JSON(response.Response{
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
