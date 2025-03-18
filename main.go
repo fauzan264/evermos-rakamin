@@ -28,15 +28,22 @@ func main() {
 	// services
 	jwtService := middleware.NewJWTService()
 	authService := services.NewAuthService(jwtService, userRepository, provinceCityRepository)
+	provinceCityService := services.NewProvinceCityRepository(provinceCityRepository)
 
 	// handleres
 	authHandler := handlers.NewAuthHandler(authService)
+	provinceCityHandler := handlers.NewProvinceCityHandler(provinceCityService)
 
 	api := router.Group("/api/v1")
 	// auth
 	api.Post("/auth/register", authHandler.RegisterUser)
 	api.Post("/auth/login", authHandler.LoginUser)
 
+	// province city
+	api.Get("/provcity/listprovincies", provinceCityHandler.GetListProvince)
+	api.Get("/provcity/detailprovince/:prov_id", provinceCityHandler.GetDetailProvince)
+	api.Get("/provcity/listcities/:prov_id", provinceCityHandler.GetListCity)
+	api.Get("/provcity/detailcity/:city_id", provinceCityHandler.GetDetailCity)
 
 	router.Listen(":8000")
 }
