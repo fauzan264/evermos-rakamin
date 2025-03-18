@@ -10,6 +10,7 @@ type tokoRepository struct {
 }
 
 type TokoRepository interface {
+	CreateToko(toko model.Toko) error
 	GetAllToko() ([]model.Toko, error)
 	GetTokoByID(id int) (model.Toko, error)
 	GetTokoByUserID(userID int) (model.Toko, error)
@@ -18,6 +19,15 @@ type TokoRepository interface {
 
 func NewTokoRepository(db *gorm.DB) *tokoRepository {
 	return &tokoRepository{db}
+}
+
+func (r *tokoRepository) CreateToko(toko model.Toko) error {
+	err := r.db.Create(&toko).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *tokoRepository) GetAllToko() ([]model.Toko, error) {

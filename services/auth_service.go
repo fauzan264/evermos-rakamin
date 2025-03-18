@@ -20,13 +20,20 @@ type AuthService interface {
 type authService struct {
 	jwtService middleware.JWTService
 	repository repositories.UserRepository
+	tokoRepository repositories.TokoRepository
 	provinceCityRepository repositories.ProvinceCityRepository
 }
 
-func NewAuthService(jwtService middleware.JWTService, repository repositories.UserRepository, provinceCityRepository repositories.ProvinceCityRepository) *authService {
+func NewAuthService(
+	jwtService middleware.JWTService,
+	repository repositories.UserRepository,
+	tokoRepository repositories.TokoRepository,
+	provinceCityRepository repositories.ProvinceCityRepository,
+) *authService {
 	return &authService{
 		jwtService,
 		repository,
+		tokoRepository,
 		provinceCityRepository,
 	}
 }
@@ -53,7 +60,16 @@ func (s *authService) RegisterUser(request request.RegisterRequest) error {
 	}
 	
 	user.KataSandi = string(kataSandiHash)
-	_, err = s.repository.CreateUser(user)
+	newUser, err := s.repository.CreateUser(user)
+	if err != nil {
+		return err
+	}
+	
+	toko := model.Toko{
+		IDUser: newUser.ID,
+	}
+	
+	err = s.tokoRepository.CreateToko(toko)
 	if err != nil {
 		return err
 	}
@@ -101,6 +117,5 @@ func (s *authService) LoginUser(request request.LoginRequest) (response.LoginRes
 		KotaResponse: dataCity,
 		Token: token,
 	}
-
 	return loginResponse, err
 }

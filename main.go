@@ -23,11 +23,12 @@ func main() {
 
 	// repositories
 	provinceCityRepository := repositories.NewProvinceCityRepository(provinceCityApiURL)
-	userRepository := repositories.NewUserRepository(db)	
+	userRepository := repositories.NewUserRepository(db)
+	tokoRepository := repositories.NewTokoRepository(db)
 
 	// services
 	jwtService := middleware.NewJWTService()
-	authService := services.NewAuthService(jwtService, userRepository, provinceCityRepository)
+	authService := services.NewAuthService(jwtService, userRepository, tokoRepository, provinceCityRepository)
 	provinceCityService := services.NewProvinceCityRepository(provinceCityRepository)
 
 	// handleres
