@@ -10,6 +10,7 @@ type categoryRepository struct {
 }
 
 type CategoryRepository interface {
+	GetListCategory() ([]model.Category, error)
 	CreateCategory(category model.Category) (model.Category, error)
 	GetCategoryByID(id int) (model.Category, error)
 	UpdateCategory(category model.Category) (model.Category, error)
@@ -18,6 +19,17 @@ type CategoryRepository interface {
 
 func NewCategoryRepository(db *gorm.DB) *categoryRepository {
 	return &categoryRepository{db}
+}
+
+func (r *categoryRepository) GetListCategory() ([]model.Category, error) {
+	var categories []model.Category
+
+	err := r.db.Find(&categories).Error
+	if err != nil {
+		return categories, err
+	}
+
+	return categories, nil
 }
 
 func (r *categoryRepository) CreateCategory(category model.Category) (model.Category, error) {
@@ -31,7 +43,7 @@ func (r *categoryRepository) CreateCategory(category model.Category) (model.Cate
 
 func (r *categoryRepository) GetCategoryByID(id int) (model.Category, error) {
 	var category model.Category
-	err := r.db.Where("id = ?", id).Find(&category).Error
+	err := r.db.Where("id = ?", id).First(&category).Error
 	if err != nil {
 		return category, err
 	}
@@ -51,7 +63,7 @@ func (r *categoryRepository) UpdateCategory(category model.Category) (model.Cate
 func (r *categoryRepository) DeleteCategory(id int) error {
 	var category model.Category
 
-	err := r.db.Where("id = ?", id).Delete(&category).Error
+	err := r.db.Delete(&category, id).Error
 	if err != nil {
 		return err
 	}

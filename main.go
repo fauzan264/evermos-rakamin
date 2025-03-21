@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/fauzan264/evermos-rakamin/config"
@@ -25,15 +26,18 @@ func main() {
 	provinceCityRepository := repositories.NewProvinceCityRepository(provinceCityApiURL)
 	userRepository := repositories.NewUserRepository(db)
 	tokoRepository := repositories.NewTokoRepository(db)
+	categoryRepository := repositories.NewCategoryRepository(db)
 
 	// services
 	jwtService := middleware.NewJWTService()
 	authService := services.NewAuthService(jwtService, userRepository, tokoRepository, provinceCityRepository)
-	provinceCityService := services.NewProvinceCityRepository(provinceCityRepository)
+	provinceCityService := services.NewProvinceCityService(provinceCityRepository)
+	categoryService := services.NewCategoryService(categoryRepository)
 
 	// handleres
 	authHandler := handlers.NewAuthHandler(authService)
 	provinceCityHandler := handlers.NewProvinceCityHandler(provinceCityService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
 
 	api := router.Group("/api/v1")
 	// auth
@@ -46,5 +50,14 @@ func main() {
 	api.Get("/provcity/listcities/:prov_id", provinceCityHandler.GetListCity)
 	api.Get("/provcity/detailcity/:city_id", provinceCityHandler.GetDetailCity)
 
-	router.Listen(":8000")
+	// category
+	api.Get("/category", categoryHandler.GetListCategory)
+	api.Get("/category/:id", categoryHandler.GetDetailCategory)
+	api.Post("/category", categoryHandler.CreateCategory)
+	api.Put("/category/:id", categoryHandler.UpdateCategory)
+	api.Delete("/category/:id", categoryHandler.DeleteCategory)
+
+	if err := router.Listen(":8000"); err != nil {
+		log.Println("Error: ", err)
+	}
 }
