@@ -19,7 +19,7 @@ type provinceCityService struct {
 	repository repositories.ProvinceCityRepository
 }
 
-func NewProvinceCityRepository(repository repositories.ProvinceCityRepository) *provinceCityService {
+func NewProvinceCityService(repository repositories.ProvinceCityRepository) *provinceCityService {
 	return &provinceCityService{repository}
 }
 
