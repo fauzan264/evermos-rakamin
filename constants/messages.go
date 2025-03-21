@@ -13,3 +13,11 @@ const (
 	FailedUpdateData = "Failed to UPDATE data"
 	FailedDeleteData = "Failed to DELETE data"
 )
+
+const (
+	SuccessRegister = "Register Succeed"
+)
+
+const (
+	SuccessDeleteCategory = "Success delete category"
+)

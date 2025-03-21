@@ -13,10 +13,15 @@ var (
 	ErrInvalidDateFormat = errors.New("Invalid date format. Use DD/MM/YYYY")
 )
 
-// province city repository
+// province city
 var (
 	ErrFailedFetchListProvince = errors.New("failed to fetch provinces")
 	ErrFailedFetchListCity = errors.New("failed to fetch cities")
 	ErrFailedFetchDetailProvince = errors.New("failed to fetch detail province")
 	ErrFailedFetchDetailCity = errors.New("failed to fetch city")
+)
+
+// category
+var (
+	ErrCategoryNotFound = errors.New("No Data Category")
 )
