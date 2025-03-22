@@ -33,11 +33,13 @@ func main() {
 	authService := services.NewAuthService(jwtService, userRepository, tokoRepository, provinceCityRepository)
 	provinceCityService := services.NewProvinceCityService(provinceCityRepository)
 	categoryService := services.NewCategoryService(categoryRepository)
+	tokoService := services.NewTokoService(tokoRepository)
 
 	// handleres
 	authHandler := handlers.NewAuthHandler(authService)
 	provinceCityHandler := handlers.NewProvinceCityHandler(provinceCityService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	tokoHandler := handlers.NewTokoHandler(tokoService)
 
 	api := router.Group("/api/v1")
 	// auth
@@ -56,6 +58,9 @@ func main() {
 	api.Post("/category", categoryHandler.CreateCategory)
 	api.Put("/category/:id", categoryHandler.UpdateCategory)
 	api.Delete("/category/:id", categoryHandler.DeleteCategory)
+
+	// toko
+	api.Get("/toko", tokoHandler.GetListToko)
 
 	if err := router.Listen(":8000"); err != nil {
 		log.Println("Error: ", err)
