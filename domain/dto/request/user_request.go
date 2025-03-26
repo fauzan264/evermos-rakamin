@@ -1,7 +1,7 @@
 package request
 
 type GetByUserIDRequest struct {
-	ID		int		`params:"id" validate:"required"`
+	ID				int		`params:"id" validate:"required"`
 }
 
 type UpdateProfileRequest struct {
