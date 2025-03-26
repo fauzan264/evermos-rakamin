@@ -28,6 +28,8 @@ func main() {
 	tokoRepository := repositories.NewTokoRepository(db)
 	categoryRepository := repositories.NewCategoryRepository(db)
 	alamatRepository := repositories.NewAlamatRepository(db)
+	productRepository := repositories.NewProductRepository(db)
+	// trxRepository := repositories.NewTRXRepository(db)
 
 	// services
 	authService := services.NewAuthService(userRepository, tokoRepository, provinceCityRepository)
@@ -35,6 +37,8 @@ func main() {
 	provinceCityService := services.NewProvinceCityService(provinceCityRepository)
 	categoryService := services.NewCategoryService(categoryRepository)
 	tokoService := services.NewTokoService(tokoRepository)
+	productService := services.NewProductService(productRepository, tokoRepository, categoryRepository)
+	// trxService := services.NewTRXService(trxRepository)
 
 	// handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -42,6 +46,8 @@ func main() {
 	provinceCityHandler := handlers.NewProvinceCityHandler(provinceCityService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	tokoHandler := handlers.NewTokoHandler(tokoService)
+	productHandler := handlers.NewProductHandler(productService)
+	// trxHandler := handlers.NewTRXHandler(trxService)
 
 	// middleware
 	authMiddleware := middleware.AuthMiddleware(userService)
@@ -80,11 +86,11 @@ func main() {
 	// api.Put("/toko", tokoHandler.UpdateProfileToko)
 
 	// product
-	// api.Get("/product", productHandler.GetListProduct)
-	// api.Get("/product/:id", productHandler.GetDetailProduct)
-	// api.Post("/product", productHandler.CreateProduct)
-	// api.Put("/product/:id", productHandler.UpdateProduct)
-	// api.Delete("/product/:id", productHandler.DeleteProduct)
+	// api.Get("/product", authMiddleware, productHandler.GetListProduct)
+	api.Get("/product/:id", authMiddleware, productHandler.GetDetailProduct)
+	api.Post("/product", authMiddleware, productHandler.CreateProduct)
+	// api.Put("/product/:id", authMiddleware, productHandler.UpdateProduct)
+	// api.Delete("/product/:id", authMiddleware, productHandler.DeleteProduct)
 
 	// trx
 	// api.Get("/trx". trxHandler.GetListTRX)
