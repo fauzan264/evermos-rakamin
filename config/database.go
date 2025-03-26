@@ -27,9 +27,9 @@ func InitDatabase() *gorm.DB {
 
 	err = db.AutoMigrate(
 		&model.User{},
-		&model.Produk{},
-		&model.FotoProduk{},
-		&model.LogProduk{},
+		&model.Product{},
+		&model.PhotoProduct{},
+		&model.LogProduct{},
 		&model.Category{},
 		&model.Alamat{},
 		&model.Toko{},
