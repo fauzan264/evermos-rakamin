@@ -6,19 +6,28 @@ import (
 	"github.com/fauzan264/evermos-rakamin/constants"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
+	"github.com/fauzan264/evermos-rakamin/domain/model"
 	"github.com/fauzan264/evermos-rakamin/repositories"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userService struct {
 	repository repositories.UserRepository
+	alamatRepository repositories.AlamatRepository
 }
 
 type UserService interface {
 	GetUserByID(request request.GetByUserIDRequest) (response.UserResponse, error)
 	UpdateUser(requestID request.GetByUserIDRequest, requestData request.UpdateProfileRequest) (response.UserResponse, error)
+	GetMyAlamat(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error)
+	GetAlamatUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error)
+	CreateAlamatUser(requestUser request.GetByUserIDRequest, requestData request.CreateAddressRequest) (response.AddressResponse, error)
+	// UpdateAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest, requestData request.UpdateAddressRequest) (response.AddressResponse, error)
+	// DeleteAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest) (response.AddressResponse, error)
+
 }
-func NewUserService(repository repositories.UserRepository) *userService {
-	return &userService{repository}
+func NewUserService(repository repositories.UserRepository, alamatRepository repositories.AlamatRepository) *userService {
+	return &userService{repository, alamatRepository}
 }
 
 func (s *userService) GetUserByID(request request.GetByUserIDRequest) (response.UserResponse, error) {
@@ -56,13 +65,19 @@ func (s *userService) UpdateUser(requestID request.GetByUserIDRequest, requestDa
 	}
 
 	user.Nama = requestData.Nama
-	user.KataSandi = requestData.KataSandi
 	user.NoTelp = requestData.NoTelp
 	user.TanggalLahir = tanggalLahir
 	user.Pekerjaan = requestData.Pekerjaan
 	user.Email = requestData.Email
 	user.IDProvinsi = requestData.IDProvinsi
 	user.IDKota = requestData.IDKota
+
+	kataSandiHash, err := bcrypt.GenerateFromPassword([]byte(requestData.KataSandi), bcrypt.MinCost)
+	if err != nil {
+		return response.UserResponse{}, err
+	}
+
+	user.KataSandi = string(kataSandiHash)
 	
 	updateUser, err := s.repository.UpdateUser(user)
 	if err != nil {
@@ -82,3 +97,74 @@ func (s *userService) UpdateUser(requestID request.GetByUserIDRequest, requestDa
 
 	return userResponse, nil
 }
+
+func (s *userService) GetMyAlamat(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error) {
+	getMyAddress, err := s.alamatRepository.GetAlamatByUserID(requestUser.ID)
+	if err != nil {
+		return []response.AddressResponse{}, err
+	}
+
+	var addressesResponse []response.AddressResponse
+	for _, address := range getMyAddress {
+		addressResponse := response.AddressResponse{
+			ID : address.ID,
+			JudulAlamat : address.JudulAlamat,
+			NamaPenerima : address.NamaPenerima,
+			NoTelp : address.NoTelp,
+			DetailAlamat : address.DetailAlamat,
+		}
+		addressesResponse = append(addressesResponse, addressResponse)
+	}
+
+	return addressesResponse, nil
+}
+
+func (s *userService) GetAlamatUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error) {
+	address, err := s.alamatRepository.GetAlamatUserByID(requestUser.ID, requestID.ID)
+	if err != nil {
+		return response.AddressResponse{}, err
+	}
+
+	addressResponse := response.AddressResponse{
+		ID : address.ID,
+		JudulAlamat : address.JudulAlamat,
+		NamaPenerima : address.NamaPenerima,
+		NoTelp : address.NoTelp,
+		DetailAlamat : address.DetailAlamat,
+	}
+	return addressResponse, nil
+}
+
+func (s *userService) CreateAlamatUser(requestUser request.GetByUserIDRequest, requestData request.CreateAddressRequest) (response.AddressResponse, error) {
+	address := model.Alamat{
+		IDUser: requestUser.ID,
+		JudulAlamat: requestData.JudulAlamat,
+		NamaPenerima: requestData.NamaPenerima,
+		NoTelp: requestData.NoTelp,
+		DetailAlamat: requestData.DetailAlamat,
+		CreatedAt: time.Now(),
+	}
+
+	createAddress, err := s.alamatRepository.CreateAlamat(address)
+	if err != nil {
+		return response.AddressResponse{}, err
+	}
+
+	addressResponse := response.AddressResponse{
+		ID : createAddress.ID,
+		JudulAlamat : createAddress.JudulAlamat,
+		NamaPenerima : createAddress. NamaPenerima,
+		NoTelp : createAddress.NoTelp,
+		DetailAlamat : createAddress.DetailAlamat,
+	}
+
+	return addressResponse, nil
+}
+
+// func (s *userService) UpdateAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest, requestData request.UpdateAddressRequest) (response.AddressResponse, error) {
+
+// }
+
+// func (s *userService) DeleteAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest) (response.AddressResponse, error) {
+
+// }

@@ -21,7 +21,7 @@ func (h *userHandler) GetMyProfile(c *fiber.Ctx) error {
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
 	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(response.Response{
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
@@ -41,7 +41,7 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
 	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(response.Response{
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedUpdateData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
@@ -80,5 +80,131 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 		Message: constants.SuccessUpdateData,
 		Errors: nil,
 		Data: userResponse,
+	})
+}
+
+func (h *userHandler) GetMyAlamat(c *fiber.Ctx) error {
+	authUser := c.Locals("authUser")
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser := request.GetByUserIDRequest{
+		ID: user.ID,
+	}
+
+	myAlamatResponse, err := h.userService.GetMyAlamat(requestUser)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessGetData,
+		Errors: nil,
+		Data: myAlamatResponse,
+	})
+}
+
+func (h *userHandler) GetDetailAlamat(c *fiber.Ctx) error {
+	authUser := c.Locals("authUser")
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser := request.GetByUserIDRequest{
+		ID: user.ID,
+	}
+
+	var requestID request.GetByAddressIDRequest
+
+	err := c.ParamsParser(&requestID)
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	myAlamatResponse, err := h.userService.GetAlamatUserByID(requestUser, requestID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessGetData,
+		Errors: nil,
+		Data: myAlamatResponse,
+	})
+}
+
+func (h *userHandler) CreateAlamatUser(c *fiber.Ctx) error {
+	authUser := c.Locals("authUser")
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser := request.GetByUserIDRequest{
+		ID: user.ID,
+	}
+
+	var requestData request.CreateAddressRequest
+
+	err := c.BodyParser(&requestData)
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+
+	addressResponse, err := h.userService.CreateAlamatUser(requestUser, requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessInsertData,
+		Errors: nil,
+		Data: addressResponse,
 	})
 }

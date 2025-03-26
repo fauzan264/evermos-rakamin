@@ -27,10 +27,11 @@ func main() {
 	userRepository := repositories.NewUserRepository(db)
 	tokoRepository := repositories.NewTokoRepository(db)
 	categoryRepository := repositories.NewCategoryRepository(db)
+	alamatRepository := repositories.NewAlamatRepository(db)
 
 	// services
 	authService := services.NewAuthService(userRepository, tokoRepository, provinceCityRepository)
-	userService := services.NewUserService(userRepository)
+	userService := services.NewUserService(userRepository, alamatRepository)
 	provinceCityService := services.NewProvinceCityService(provinceCityRepository)
 	categoryService := services.NewCategoryService(categoryRepository)
 	tokoService := services.NewTokoService(tokoRepository)
@@ -53,6 +54,11 @@ func main() {
 	// user
 	api.Get("/user", authMiddleware, userHandler.GetMyProfile)
 	api.Put("/user", authMiddleware, userHandler.UpdateProfile)
+	api.Get("/user/alamat", authMiddleware, userHandler.GetMyAlamat)
+	api.Get("/user/alamat/:id", authMiddleware, userHandler.GetDetailAlamat)
+	api.Post("/user/alamat", authMiddleware, userHandler.CreateAlamatUser)
+	// api.Put("/user/alamat/:id", authMiddleware, userHandler.UpdateAlamatUser)
+	// api.Delete("/user/alamat/:id", authMiddleware, userHandler.DeleteAlamatUser)
 
 	// province city
 	api.Get("/provcity/listprovincies", provinceCityHandler.GetListProvince)
@@ -68,7 +74,22 @@ func main() {
 	api.Delete("/category/:id", authMiddleware, categoryHandler.DeleteCategory)
 
 	// toko
+	// api.Get("/toko/my", tokoHandler.MyToko)
 	api.Get("/toko", tokoHandler.GetListToko)
+	// api.Get("/toko/:id", tokoHandler.GetDetailToko)
+	// api.Put("/toko", tokoHandler.UpdateProfileToko)
+
+	// product
+	// api.Get("/product", productHandler.GetListProduct)
+	// api.Get("/product/:id", productHandler.GetDetailProduct)
+	// api.Post("/product", productHandler.CreateProduct)
+	// api.Put("/product/:id", productHandler.UpdateProduct)
+	// api.Delete("/product/:id", productHandler.DeleteProduct)
+
+	// trx
+	// api.Get("/trx". trxHandler.GetListTRX)
+	// api.Get("/trx/:id". trxHandler.GetDetailTRX)
+	// api.Post("/trx". trxHandler.CreatelTRX)
 
 	if err := router.Listen(":8000"); err != nil {
 		log.Println("Error: ", err)

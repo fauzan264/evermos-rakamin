@@ -12,7 +12,8 @@ type alamatRepository struct {
 type AlamatRepository interface {
 	CreateAlamat(alamat model.Alamat) (model.Alamat, error)
 	GetAlamatByID(id int) (model.Alamat, error)
-	GetAlamatByUserID(userID int) (model.Alamat, error)
+	GetAlamatByUserID(userID int) ([]model.Alamat, error)
+	GetAlamatUserByID(userID int, id int) (model.Alamat, error)
 	UpdateAlamat(alamat model.Alamat) (model.Alamat, error)
 	DeleteAlamat(id int) error
 }
@@ -40,9 +41,19 @@ func (r *alamatRepository) GetAlamatByID(id int) (model.Alamat, error) {
 	return alamat, nil
 }
 
-func (r *alamatRepository) GetAlamatByUserID(userID int) (model.Alamat, error) {
-	var alamat model.Alamat
+func (r *alamatRepository) GetAlamatByUserID(userID int) ([]model.Alamat, error) {
+	var alamat []model.Alamat
 	err := r.db.Where("id_user = ?", userID).Find(&alamat).Error
+	if err != nil {
+		return alamat, err
+	}
+
+	return alamat, nil
+}
+
+func (r *alamatRepository) GetAlamatUserByID(userID int, id int) (model.Alamat, error) {
+	var alamat model.Alamat
+	err := r.db.Where("id_user = ? and id = ?", userID, id).First(&alamat).Error
 	if err != nil {
 		return alamat, err
 	}
