@@ -37,6 +37,7 @@ func main() {
 
 	// handlers
 	authHandler := handlers.NewAuthHandler(authService)
+	userHandler := handlers.NewUserHandler(userService)
 	provinceCityHandler := handlers.NewProvinceCityHandler(provinceCityService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	tokoHandler := handlers.NewTokoHandler(tokoService)
@@ -48,6 +49,10 @@ func main() {
 	// auth
 	api.Post("/auth/register", authHandler.RegisterUser)
 	api.Post("/auth/login", authHandler.LoginUser)
+
+	// user
+	api.Get("/user", authMiddleware, userHandler.GetMyProfile)
+	api.Put("/user", authMiddleware, userHandler.UpdateProfile)
 
 	// province city
 	api.Get("/provcity/listprovincies", provinceCityHandler.GetListProvince)
