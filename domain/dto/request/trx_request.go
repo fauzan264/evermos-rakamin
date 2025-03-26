@@ -7,6 +7,6 @@ type CreateTrxRequest struct {
 }
 
 type DetailTrxRequest struct {
-	IDProduk		int						`json:"product_id" binding:"required"`
-	Kuantitas		int						`json:"kuantitas" binding:"required"`
+	IDProduk			int					`json:"product_id" binding:"required"`
+	Kuantitas			int					`json:"kuantitas" binding:"required"`
 }
