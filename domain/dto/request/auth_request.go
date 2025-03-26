@@ -1,8 +1,8 @@
 package request
 
 type LoginRequest struct {
-	NoTelp			string	`json:"no_telp" validate:"required"`
-	KataSandi		string	`json:"kata_sandi" validate:"required"`
+	NoTelp			string		`json:"no_telp" validate:"required"`
+	KataSandi		string		`json:"kata_sandi" validate:"required"`
 }
 
 type RegisterRequest struct {
