@@ -94,7 +94,6 @@ func (s *categoryService) UpdateCategory(requestID request.GetByCategoryIDReques
 	categoryResponse := response.CategoryResponse{
 		ID: updateCategory.ID,
 		NamaCategory: updateCategory.NamaCategory,
-		UpdatedAt: &updateCategory.CreatedAt,
 	}
 	
 	return categoryResponse, nil
