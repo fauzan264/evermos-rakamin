@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"fmt"
-
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/services"
 	"github.com/fauzan264/evermos-rakamin/utils"
@@ -27,7 +25,6 @@ func AuthMiddleware(userService services.UserService) fiber.Handler {
 
 		userID, ok := claims["id"].(float64)
 		if !ok {
-			fmt.Println("kenapa ya?")
 			return sendUnauthorizedResponse(c)
 		}
 
