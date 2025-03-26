@@ -1,5 +1,9 @@
 package request
 
+type GetTokoByID struct {
+	ID		int 				`params:"id" validate:"required"`
+}
+
 type TokoListRequest struct {
 	Page	int					`query:"page"`
 	Limit	int					`query:"limit"`

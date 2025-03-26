@@ -16,6 +16,40 @@ func NewTokoHandler(tokoService services.TokoService) *tokoHandler {
 	return &tokoHandler{tokoService}
 }
 
+func (h *tokoHandler) MyToko(c *fiber.Ctx) error {
+	authUser := c.Locals("authUser")
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser := request.GetByUserIDRequest{
+		ID: user.ID,
+	}
+
+	myTokoResponse, err := h.tokoService.GetMyToko(requestUser)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessGetData,
+		Errors: nil,
+		Data: myTokoResponse,
+	})
+}
+
 func (h *tokoHandler) GetListToko(c *fiber.Ctx) error {
 	var request request.TokoListRequest
 
@@ -52,5 +86,36 @@ func (h *tokoHandler) GetListToko(c *fiber.Ctx) error {
 		Message: constants.SuccessGetData,
 		Errors: nil,
 		Data: tokoResponse,
+	})
+}
+
+func (h *tokoHandler) GetDetailToko(c *fiber.Ctx) error {
+	var requestID request.GetTokoByID
+
+	err := c.ParamsParser(&requestID)
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	myTokoResponse, err := h.tokoService.GetTokoByID(requestID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessGetData,
+		Errors: nil,
+		Data: myTokoResponse,
 	})
 }

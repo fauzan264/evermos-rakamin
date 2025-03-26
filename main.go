@@ -74,9 +74,9 @@ func main() {
 	api.Delete("/category/:id", authMiddleware, categoryHandler.DeleteCategory)
 
 	// toko
-	// api.Get("/toko/my", tokoHandler.MyToko)
-	api.Get("/toko", tokoHandler.GetListToko)
-	// api.Get("/toko/:id", tokoHandler.GetDetailToko)
+	api.Get("/toko/my", authMiddleware, tokoHandler.MyToko)
+	api.Get("/toko", authMiddleware, tokoHandler.GetListToko)
+	api.Get("/toko/:id", authMiddleware, tokoHandler.GetDetailToko)
 	// api.Put("/toko", tokoHandler.UpdateProfileToko)
 
 	// product

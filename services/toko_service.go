@@ -7,15 +7,32 @@ import (
 )
 
 type TokoService interface {
+	GetMyToko(requestUser request.GetByUserIDRequest) (response.TokoResponse, error)
 	GetListToko(request request.TokoListRequest) (response.PaginatedResponse, error)
+	GetTokoByID(requestID request.GetTokoByID) (response.TokoResponse, error)
 }
 
 type tokoService struct {
-	tokoRepository repositories.TokoRepository
+	repository repositories.TokoRepository
 }
 
-func NewTokoService(tokoRepository repositories.TokoRepository) *tokoService {
-	return &tokoService{tokoRepository}
+func NewTokoService(repository repositories.TokoRepository) *tokoService {
+	return &tokoService{repository}
+}
+
+func (s *tokoService) GetMyToko(requestUser request.GetByUserIDRequest) (response.TokoResponse, error) {
+	getMyToko, err := s.repository.GetTokoByUserID(requestUser.ID)
+	if err != nil {
+		return response.TokoResponse{}, err
+	}
+
+	tokoResponse := response.TokoResponse{
+		ID : getMyToko.ID,
+		NamaToko: getMyToko.NamaToko,
+		URLFoto: getMyToko.URLFoto,
+	}
+
+	return tokoResponse, nil
 }
 
 func (s *tokoService) GetListToko(request request.TokoListRequest) (response.PaginatedResponse, error) {
@@ -23,7 +40,7 @@ func (s *tokoService) GetListToko(request request.TokoListRequest) (response.Pag
 	limit := request.Limit
 	name := request.Name
 
-	getListToko, err := s.tokoRepository.GetListToko(page, limit, name)
+	getListToko, err := s.repository.GetListToko(page, limit, name)
 
 	var tokoResponse response.PaginatedResponse
 
@@ -34,9 +51,9 @@ func (s *tokoService) GetListToko(request request.TokoListRequest) (response.Pag
 	listToko := make([]response.TokoResponse, 0)
 	for _, toko := range getListToko {
 		dataToko := response.TokoResponse{
-			ID: uint64(toko.ID),
+			ID: toko.ID,
 			NamaToko: toko.NamaToko,
-			UrlFoto: toko.URLFoto,
+			URLFoto: toko.URLFoto,
 		}
 
 		listToko = append(listToko, dataToko)
@@ -46,5 +63,19 @@ func (s *tokoService) GetListToko(request request.TokoListRequest) (response.Pag
 	tokoResponse.Page = request.Page
 	tokoResponse.Limit = request.Limit
 
+	return tokoResponse, nil
+}
+
+func (s *tokoService) GetTokoByID(requestID request.GetTokoByID) (response.TokoResponse, error) {
+	toko, err := s.repository.GetTokoByID(requestID.ID)
+	if err != nil {
+		return response.TokoResponse{}, err
+	}
+
+	tokoResponse := response.TokoResponse{
+		ID : toko.ID,
+		NamaToko : toko.NamaToko,
+		URLFoto : toko.URLFoto,
+	}
 	return tokoResponse, nil
 }
