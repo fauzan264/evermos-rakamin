@@ -22,7 +22,7 @@ func (h *authHandler) RegisterUser(c *fiber.Ctx) error {
 
 	err := c.BodyParser(&request)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedInsertData,
 			Errors: helpers.FormatValidationError(err),
@@ -44,7 +44,7 @@ func (h *authHandler) RegisterUser(c *fiber.Ctx) error {
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
-		Data: "Register Succeed",
+		Data: constants.SuccessRegister,
 	})
 }
 
@@ -53,7 +53,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 
 	err := c.BodyParser(&request)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedInsertData,
 			Errors: helpers.FormatValidationError(err),

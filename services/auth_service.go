@@ -7,8 +7,8 @@ import (
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
 	"github.com/fauzan264/evermos-rakamin/domain/model"
-	"github.com/fauzan264/evermos-rakamin/middleware"
 	"github.com/fauzan264/evermos-rakamin/repositories"
+	"github.com/fauzan264/evermos-rakamin/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,27 +18,24 @@ type AuthService interface {
 }
 
 type authService struct {
-	jwtService middleware.JWTService
 	repository repositories.UserRepository
 	tokoRepository repositories.TokoRepository
 	provinceCityRepository repositories.ProvinceCityRepository
 }
 
 func NewAuthService(
-	jwtService middleware.JWTService,
 	repository repositories.UserRepository,
 	tokoRepository repositories.TokoRepository,
 	provinceCityRepository repositories.ProvinceCityRepository,
 ) *authService {
 	return &authService{
-		jwtService,
 		repository,
 		tokoRepository,
 		provinceCityRepository,
 	}
 }
 
-func (s *authService) RegisterUser(request request.RegisterRequest) error {
+func (s *authService) RegisterUser(request request.RegisterRequest) (error) {
 	tanggalLahir, err := time.Parse("02/01/2006", request.TanggalLahir)
 	if err != nil {
 		return constants.ErrInvalidDateFormat
@@ -101,7 +98,8 @@ func (s *authService) LoginUser(request request.LoginRequest) (response.LoginRes
 		return response.LoginResponse{}, err
 	}
 
-	token, err := s.jwtService.GenerateToken(user.ID)
+	
+	token, err := utils.NewJWTService().GenerateToken(user.ID)
 	if err != nil {
 		return response.LoginResponse{}, err
 	}

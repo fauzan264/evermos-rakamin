@@ -29,17 +29,20 @@ func main() {
 	categoryRepository := repositories.NewCategoryRepository(db)
 
 	// services
-	jwtService := middleware.NewJWTService()
-	authService := services.NewAuthService(jwtService, userRepository, tokoRepository, provinceCityRepository)
+	authService := services.NewAuthService(userRepository, tokoRepository, provinceCityRepository)
+	userService := services.NewUserService(userRepository)
 	provinceCityService := services.NewProvinceCityService(provinceCityRepository)
 	categoryService := services.NewCategoryService(categoryRepository)
 	tokoService := services.NewTokoService(tokoRepository)
 
-	// handleres
+	// handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	provinceCityHandler := handlers.NewProvinceCityHandler(provinceCityService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	tokoHandler := handlers.NewTokoHandler(tokoService)
+
+	// middleware
+	authMiddleware := middleware.AuthMiddleware(userService)
 
 	api := router.Group("/api/v1")
 	// auth
@@ -53,11 +56,11 @@ func main() {
 	api.Get("/provcity/detailcity/:city_id", provinceCityHandler.GetDetailCity)
 
 	// category
-	api.Get("/category", categoryHandler.GetListCategory)
-	api.Get("/category/:id", categoryHandler.GetDetailCategory)
-	api.Post("/category", categoryHandler.CreateCategory)
-	api.Put("/category/:id", categoryHandler.UpdateCategory)
-	api.Delete("/category/:id", categoryHandler.DeleteCategory)
+	api.Get("/category", authMiddleware, categoryHandler.GetListCategory)
+	api.Get("/category/:id", authMiddleware, categoryHandler.GetDetailCategory)
+	api.Post("/category", authMiddleware, categoryHandler.CreateCategory)
+	api.Put("/category/:id", authMiddleware, categoryHandler.UpdateCategory)
+	api.Delete("/category/:id", authMiddleware, categoryHandler.DeleteCategory)
 
 	// toko
 	api.Get("/toko", tokoHandler.GetListToko)
