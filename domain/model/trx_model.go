@@ -26,7 +26,7 @@ type DetailTrx struct {
 	UpdatedAt 			time.Time		`gorm:"type:timestamp"`
 
 	Trx					Trx 			`gorm:"foreignKey:IDTrx;references:ID"`
-	LogProduk			LogProduk		`gorm:"foreignKey:IDLogProduk;references:ID"`
+	LogProduk			LogProduct		`gorm:"foreignKey:IDLogProduk;references:ID"`
 	Toko				Toko			`gorm:"foreignKey:IDToko;references:ID"`
 }
 
