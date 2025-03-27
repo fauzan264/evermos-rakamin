@@ -138,24 +138,6 @@ func (s *productService) CreateProduct(requestUser request.GetByUserIDRequest, r
 
 	tx.Commit()
 
-	logProduct := model.LogProduct{
-		IDProduk: createProduct.ID,
-		NamaProduk:    requestData.NamaProduk,
-		Slug: slugProduct,
-		HargaReseller: requestData.HargaReseller,
-		HargaKonsumen: requestData.HargaKonsumen,
-		Stock:         *requestData.Stok,
-		Deskripsi:     requestData.Deskripsi,
-		CreatedAt:     time.Now(),
-		IDToko:        getToko.ID,
-		IDCategory:    *requestData.IDCategory,
-	}
-
-	_, err = s.repository.CreateLogProduct(logProduct)
-	if err != nil {
-		return response.ProductResponse{}, err
-	}
-
 	var photosResponse []response.PhotoProductResponse
 	for _, createPhoto := range createPhotos {
 		photosResponse = append(photosResponse, response.PhotoProductResponse{
@@ -301,24 +283,6 @@ func (s *productService) UpdateProduct(
 	}
 	
 	tx.Commit()
-
-	logProduct := model.LogProduct{
-		IDProduk: product.ID,
-		NamaProduk: product.NamaProduk,
-		Slug: slugProduct,
-		HargaReseller: product.HargaReseller,
-		HargaKonsumen: product.HargaKonsumen,
-		Stock: product.Stok,
-		Deskripsi: product.Deskripsi,
-		CreatedAt: time.Now(),
-		IDToko: getToko.ID,
-		IDCategory: product.IDCategory,
-	}
-
-	_, err = s.repository.CreateLogProduct(logProduct)
-	if err != nil {
-		return response.ProductResponse{}, err
-	}
 
 	var photosResponse []response.PhotoProductResponse
 	if len(requestData.Photos) > 0 {
