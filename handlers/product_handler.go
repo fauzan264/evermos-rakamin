@@ -126,7 +126,7 @@ func (h *productHandler) CreateProduct(c *fiber.Ctx) error {
 	var photos []request.PhotoProductRequest
 
 	// Pastikan folder "uploads" ada
-	uploadDir := "uploads/products"
+	uploadDir := "uploads/product_images"
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
 		os.Mkdir(uploadDir, os.ModePerm)
 	}
@@ -193,6 +193,7 @@ func (h *productHandler) UpdateProduct(c *fiber.Ctx) error {
 			Status: false,
 			Message: constants.FailedUpdateData,
 			Errors: helpers.FormatValidationError(err),
+			Data: nil,
 		})
 	}
 
@@ -254,8 +255,7 @@ func (h *productHandler) UpdateProduct(c *fiber.Ctx) error {
 	files := form.File["photos"]
 	var photos []request.PhotoProductRequest
 
-	// Pastikan folder "uploads" ada
-	uploadDir := "uploads/products"
+	uploadDir := "uploads/product_images"
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
 		os.Mkdir(uploadDir, os.ModePerm)
 	}

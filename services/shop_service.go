@@ -1,6 +1,9 @@
 package services
 
 import (
+	"os"
+
+	"github.com/fauzan264/evermos-rakamin/constants"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
 	"github.com/fauzan264/evermos-rakamin/repositories"
@@ -10,6 +13,7 @@ type TokoService interface {
 	GetMyToko(requestUser request.GetByUserIDRequest) (response.TokoResponse, error)
 	GetListToko(request request.TokoListRequest) (response.PaginatedResponse, error)
 	GetTokoByID(requestID request.GetTokoByID) (response.TokoResponse, error)
+	UpdateToko(requestUser request.GetByUserIDRequest,  requestID request.GetTokoByID, requestData request.UpdateProfileShopRequest) (response.TokoResponse, error)
 }
 
 type tokoService struct {
@@ -78,4 +82,41 @@ func (s *tokoService) GetTokoByID(requestID request.GetTokoByID) (response.TokoR
 		URLFoto : toko.URLFoto,
 	}
 	return tokoResponse, nil
+}
+
+func (s *tokoService) UpdateToko(
+	requestUser request.GetByUserIDRequest,
+	requestID request.GetTokoByID,
+	requestData request.UpdateProfileShopRequest,
+) (response.TokoResponse, error) {
+	toko, err := s.repository.GetTokoByID(requestID.ID)
+	if err != nil {
+		return response.TokoResponse{}, err
+	}
+
+	if toko.IDUser != requestUser.ID {
+		return response.TokoResponse{}, constants.ErrUnauthorized
+	}
+
+	toko.NamaToko = requestData.Nama
+
+	if requestData.Photo != "" {
+		if toko.URLFoto != "" {
+			os.Remove(toko.URLFoto)
+		}
+		toko.URLFoto = requestData.Photo
+	}
+
+	updateToko, err := s.repository.UpdateToko(toko)
+	if err != nil {
+		return response.TokoResponse{}, err
+	}
+
+	responseToko := response.TokoResponse{
+		ID: updateToko.ID,
+		NamaToko: updateToko.NamaToko,
+		URLFoto: updateToko.URLFoto,
+	}
+
+	return responseToko, nil
 }

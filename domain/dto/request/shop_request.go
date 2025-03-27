@@ -1,7 +1,7 @@
 package request
 
 type GetTokoByID struct {
-	ID				int 		`params:"id" validate:"required"`
+	ID				int 		`params:"id_toko" validate:"required"`
 }
 
 type TokoListRequest struct {

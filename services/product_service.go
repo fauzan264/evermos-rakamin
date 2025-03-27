@@ -199,6 +199,55 @@ func (s *productService) UpdateProduct(
 	requestID request.GetByProductIDRequest,
 	requestData request.ProductRequest,
 ) (response.ProductResponse, error) {
+	product, err := s.repository.GetProductByID(requestID.ID)
+	if err != nil {
+		return response.ProductResponse{}, err
+	}
+	
+	if product.Toko.IDUser != requestUser.ID {
+		return response.ProductResponse{}, constants.ErrUnauthorized
+	}
+
+	if requestData.NamaProduk != "" {
+		product.NamaProduk = requestData.NamaProduk
+	}
+	
+	if requestData.IDCategory != nil {
+		product.IDCategory = *requestData.IDCategory
+	}
+	
+	if requestData.HargaReseller != "" {
+		product.HargaReseller = requestData.HargaReseller
+	}
+	
+	if requestData.HargaKonsumen != "" {
+		product.HargaKonsumen = requestData.HargaKonsumen
+	}
+	
+	if requestData.Stok != nil {
+		product.Stok = *requestData.Stok
+	}
+	
+	if requestData.Deskripsi != "" {
+		product.Deskripsi = requestData.Deskripsi
+	}
+
+	product.UpdatedAt = time.Now()
+	
+
+	photos, err := s.repository.GetPhotosProductByProductID(product.ID)
+	if err != nil {
+		return response.ProductResponse{}, err
+	}
+
+	getToko, err := s.tokoRepository.GetTokoByUserID(requestUser.ID)
+	if err != nil {
+		return response.ProductResponse{}, err
+	}
+
+	slugProduct := fmt.Sprintf("%s-%d", requestData.NamaProduk, time.Now().UnixNano()/int64(time.Millisecond))
+	product.Slug = slug.Make(slugProduct)
+
 	tx := s.repository.BeginTransaction()
 	defer func() {
 		if r := recover(); r != nil {
@@ -206,118 +255,64 @@ func (s *productService) UpdateProduct(
 		}
 	}()
 
-
-	getProduct, err := s.repository.GetProductByID(requestID.ID)
-	if err != nil {
-		return response.ProductResponse{}, err
-	}
-	
-	if getProduct.Toko.IDUser != requestUser.ID {
-		return response.ProductResponse{}, constants.ErrUnauthorized
-	}
-
-	if requestData.NamaProduk == "" {
-		requestData.NamaProduk = getProduct.NamaProduk
-	}
-	
-	if requestData.IDCategory == nil {
-		requestData.IDCategory = &getProduct.IDCategory
-	}
-	
-	if requestData.HargaReseller == "" {
-		requestData.HargaReseller = getProduct.HargaReseller
-	}
-	
-	if requestData.HargaKonsumen == "" {
-		requestData.HargaKonsumen = getProduct.HargaKonsumen
-	}
-	
-	if requestData.Stok == nil {
-		requestData.Stok = &getProduct.Stok
-	}
-	
-	if requestData.Deskripsi == "" {
-		requestData.Deskripsi = getProduct.Deskripsi
-	}
-	
-
-	getPhotos, err := s.repository.GetPhotosProductByProductID(getProduct.ID)
-	if err != nil {
-		return response.ProductResponse{}, err
-	}
-
-	getToko, err := s.tokoRepository.GetTokoByUserID(requestUser.ID)
+	_, err = s.repository.UpdateProduct(tx, product)
 	if err != nil {
 		tx.Rollback()
 		return response.ProductResponse{}, err
 	}
 
-	product := model.Product{
-		ID: getProduct.ID,
-		NamaProduk: requestData.NamaProduk,
-		HargaReseller: requestData.HargaReseller,
-		HargaKonsumen: requestData.HargaKonsumen,
-		Stok: *requestData.Stok,
-		Deskripsi: requestData.Deskripsi,
-		CreatedAt: getProduct.CreatedAt,
-		UpdatedAt: time.Now(),
-		IDToko: getProduct.IDToko,
-		IDCategory: *requestData.IDCategory,
-	}
-
-	slugProduct := fmt.Sprintf("%s-%d", requestData.NamaProduk, time.Now().UnixNano()/int64(time.Millisecond))
-	product.Slug = slug.Make(slugProduct)
-
-	updateProduct, err := s.repository.UpdateProduct(tx, product)
-	if err != nil {
-		tx.Rollback()
-		return response.ProductResponse{}, err
-	}
-
-	var photos []model.PhotoProduct
-	for _, photo := range requestData.Photos {
-		photoProduct := model.PhotoProduct{
-			IDProduk: getProduct.ID,
-			URL: photo.URL,
-			CreatedAt: getPhotos[0].CreatedAt,
-			UpdatedAt: time.Now(),
-		}
-		photos = append(photos, photoProduct)
-	}
-
-	err = s.repository.DeleteAllPhotosByProductID(tx, product.ID)
-	if err != nil {
-		tx.Rollback()
-		return response.ProductResponse{}, err
+	var createdAt time.Time
+	if len(photos) > 0 {
+		createdAt = photos[0].CreatedAt
+	} else {
+		createdAt = time.Now()
 	}
 
 	var createPhotos []model.PhotoProduct
-	if len(photos) > 0 {
-		createPhotos, err = s.repository.CreatePhotosProduct(tx, photos)
+	if len(requestData.Photos) > 0 {
+		if len(photos) > 0  {
+			err = s.repository.DeleteAllPhotosByProductID(tx, product.ID)
+			if err != nil {
+				tx.Rollback()
+				return response.ProductResponse{}, err
+			}
+	
+			for _, existingPhoto := range photos {
+				os.Remove(existingPhoto.URL)
+			}
+		}
+	
+		var newPhotos []model.PhotoProduct
+		for _, photo := range requestData.Photos {
+			photoProduct := model.PhotoProduct{
+				IDProduk: product.ID,
+				URL: photo.URL,
+				CreatedAt: createdAt,
+				UpdatedAt: time.Now(),
+			}
+			newPhotos = append(newPhotos, photoProduct)
+		}
+	
+		createPhotos, err = s.repository.CreatePhotosProduct(tx, newPhotos)
 		if err != nil {
 			tx.Rollback()
 			return response.ProductResponse{}, err
-		}
-
-		for _, existingPhoto := range getPhotos {
-			fmt.Println(existingPhoto.URL)
-			os.Remove(existingPhoto.URL)
-		}
+		}	
 	}
-
+	
 	tx.Commit()
 
 	logProduct := model.LogProduct{
-		IDProduk: getProduct.ID,
-		NamaProduk:    requestData.NamaProduk,
+		IDProduk: product.ID,
+		NamaProduk: product.NamaProduk,
 		Slug: slugProduct,
-		HargaReseller: requestData.HargaReseller,
-		HargaKonsumen: requestData.HargaKonsumen,
-		Stock:          *requestData.Stok,
-		Deskripsi:     requestData.Deskripsi,
-		CreatedAt:     time.Now(),
-		IDToko:        getToko.ID,
-		IDCategory:    *requestData.IDCategory,
+		HargaReseller: product.HargaReseller,
+		HargaKonsumen: product.HargaKonsumen,
+		Stock: product.Stok,
+		Deskripsi: product.Deskripsi,
+		CreatedAt: time.Now(),
+		IDToko: getToko.ID,
+		IDCategory: product.IDCategory,
 	}
 
 	_, err = s.repository.CreateLogProduct(logProduct)
@@ -326,12 +321,24 @@ func (s *productService) UpdateProduct(
 	}
 
 	var photosResponse []response.PhotoProductResponse
-	for _, createPhoto := range createPhotos {
-		photosResponse = append(photosResponse, response.PhotoProductResponse{
-			ID:       createPhoto.ID,
-			IDProduk: createPhoto.IDProduk,
-			URL:      createPhoto.URL,
-		})
+	if len(requestData.Photos) > 0 {
+		for _, createPhoto := range createPhotos {
+			photosResponse = append(photosResponse, response.PhotoProductResponse{
+				ID:       createPhoto.ID,
+				IDProduk: createPhoto.IDProduk,
+				URL:      createPhoto.URL,
+			})
+		}
+	} else {
+		if len(photos) > 0 {
+			for _, photo := range photos {
+				photosResponse = append(photosResponse, response.PhotoProductResponse{
+					ID:       photo.ID,
+					IDProduk: photo.IDProduk,
+					URL:      photo.URL,
+				})
+			}
+		}
 	}
 
 	tokoResponse := response.TokoResponse{
@@ -340,21 +347,21 @@ func (s *productService) UpdateProduct(
 		URLFoto:  getToko.URLFoto,
 	}
 
-	getCategory, _ := s.categoryRepository.GetCategoryByID(updateProduct.IDCategory)
+	category, _ := s.categoryRepository.GetCategoryByID(product.IDCategory)
 
 	categoryResponse := response.CategoryResponse{
-		ID:           getCategory.ID,
-		NamaCategory: getCategory.NamaCategory,
+		ID:           category.ID,
+		NamaCategory: category.NamaCategory,
 	}
 
 	productResponse := response.ProductResponse{
-		ID:            updateProduct.ID,
-		NamaProduk:    updateProduct.NamaProduk,
-		Slug:          updateProduct.Slug,
-		HargaReseller: updateProduct.HargaReseller,
-		HargaKonsumen: updateProduct.HargaKonsumen,
-		Stok:          updateProduct.Stok,
-		Deskripsi:     updateProduct.Deskripsi,
+		ID:            product.ID,
+		NamaProduk:    product.NamaProduk,
+		Slug:          product.Slug,
+		HargaReseller: product.HargaReseller,
+		HargaKonsumen: product.HargaKonsumen,
+		Stok:          product.Stok,
+		Deskripsi:     product.Deskripsi,
 		Toko:          tokoResponse,
 		Category:      categoryResponse,
 		Photos:        photosResponse,
@@ -395,7 +402,6 @@ func (s *productService) DeleteProduct(
 	}
 	
 	for _, existingPhoto := range getPhotos {
-		fmt.Println(existingPhoto.URL)
 		os.Remove(existingPhoto.URL)
 	}
 

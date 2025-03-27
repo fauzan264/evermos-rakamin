@@ -82,8 +82,8 @@ func main() {
 	// toko
 	api.Get("/toko/my", authMiddleware, tokoHandler.MyToko)
 	api.Get("/toko", authMiddleware, tokoHandler.GetListToko)
-	api.Get("/toko/:id", authMiddleware, tokoHandler.GetDetailToko)
-	// api.Put("/toko", tokoHandler.UpdateProfileToko)
+	api.Get("/toko/:id_toko", authMiddleware, tokoHandler.GetDetailToko)
+	api.Put("/toko/:id_toko", authMiddleware, tokoHandler.UpdateProfileToko)
 
 	// product
 	// api.Get("/product", authMiddleware, productHandler.GetListProduct)
