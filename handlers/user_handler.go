@@ -38,6 +38,9 @@ func (h *userHandler) GetMyProfile(c *fiber.Ctx) error {
 }
 
 func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
+	var requestID request.GetByUserIDRequest
+	var requestData request.UpdateProfileRequest
+
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
 	if !ok {
@@ -49,11 +52,7 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 		})
 	}
 
-	requestID := request.GetByUserIDRequest{
-		ID: user.ID,
-	}
-
-	var requestData request.UpdateProfileRequest
+	requestID.ID = user.ID
 
 	err := c.BodyParser(&requestData)
 	if err != nil {
@@ -84,6 +83,8 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 }
 
 func (h *userHandler) GetMyAlamat(c *fiber.Ctx) error {
+	var requestUser request.GetByUserIDRequest
+
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
 	if !ok {
@@ -95,9 +96,7 @@ func (h *userHandler) GetMyAlamat(c *fiber.Ctx) error {
 		})
 	}
 
-	requestUser := request.GetByUserIDRequest{
-		ID: user.ID,
-	}
+	requestUser.ID = user.ID
 
 	myAlamatResponse, err := h.userService.GetMyAlamat(requestUser)
 	if err != nil {
@@ -118,6 +117,9 @@ func (h *userHandler) GetMyAlamat(c *fiber.Ctx) error {
 }
 
 func (h *userHandler) GetDetailAlamat(c *fiber.Ctx) error {
+	var requestUser request.GetByUserIDRequest
+	var requestID request.GetByAddressIDRequest
+
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
 	if !ok {
@@ -129,11 +131,7 @@ func (h *userHandler) GetDetailAlamat(c *fiber.Ctx) error {
 		})
 	}
 
-	requestUser := request.GetByUserIDRequest{
-		ID: user.ID,
-	}
-
-	var requestID request.GetByAddressIDRequest
+	requestUser.ID = user.ID
 
 	err := c.ParamsParser(&requestID)
 	if err != nil {
@@ -164,6 +162,9 @@ func (h *userHandler) GetDetailAlamat(c *fiber.Ctx) error {
 }
 
 func (h *userHandler) CreateAlamatUser(c *fiber.Ctx) error {
+	var requestUser request.GetByUserIDRequest
+	var requestData request.CreateAddressRequest
+
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
 	if !ok {
@@ -175,11 +176,7 @@ func (h *userHandler) CreateAlamatUser(c *fiber.Ctx) error {
 		})
 	}
 
-	requestUser := request.GetByUserIDRequest{
-		ID: user.ID,
-	}
-
-	var requestData request.CreateAddressRequest
+	requestUser.ID = user.ID
 
 	err := c.BodyParser(&requestData)
 	if err != nil {
@@ -288,6 +285,7 @@ func (h *userHandler) DeleteAlamatUser(c *fiber.Ctx) error {
 			Status: false,
 			Message: constants.FailedDeleteData,
 			Errors: helpers.FormatValidationError(err),
+			Data: nil,
 		})
 	}
 
