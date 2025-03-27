@@ -208,3 +208,103 @@ func (h *userHandler) CreateAlamatUser(c *fiber.Ctx) error {
 		Data: addressResponse,
 	})
 }
+
+func (h *userHandler) UpdateAlamatUser(c *fiber.Ctx) error {
+	var requestUser request.GetByUserIDRequest
+	var requestID request.GetByAddressIDRequest
+	var requestData request.UpdateAddressRequest
+
+	authUser := c.Locals("authUser")
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedUpdateData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser.ID = user.ID
+
+	err := c.ParamsParser(&requestID)
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedUpdateData,
+			Errors: helpers.FormatValidationError(err),
+		})
+	}
+
+	err = c.BodyParser(&requestData)
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedUpdateData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+
+	addressResponse, err := h.userService.UpdateAlamatUser(requestUser, requestID, requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedUpdateData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessUpdateData,
+		Errors: nil,
+		Data: addressResponse,
+	})
+	
+}
+
+func (h *userHandler) DeleteAlamatUser(c *fiber.Ctx) error {
+	var requestUser request.GetByUserIDRequest
+	var requestID request.GetByAddressIDRequest
+
+	authUser := c.Locals("authUser")
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedDeleteData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser.ID = user.ID
+
+	err := c.ParamsParser(&requestID)
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedDeleteData,
+			Errors: helpers.FormatValidationError(err),
+		})
+	}
+
+	err = h.userService.DeleteAlamatUser(requestUser, requestID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedDeleteData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessDeleteData,
+		Errors: nil,
+		Data: true,
+	})
+}

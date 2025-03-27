@@ -33,7 +33,7 @@ func (r *alamatRepository) CreateAlamat(alamat model.Alamat) (model.Alamat, erro
 
 func (r *alamatRepository) GetAlamatByID(id int) (model.Alamat, error) {
 	var alamat model.Alamat
-	err := r.db.Where("id = ?", id).Find(&alamat).Error
+	err := r.db.Where("id = ?", id).First(&alamat).Error
 	if err != nil {
 		return alamat, err
 	}

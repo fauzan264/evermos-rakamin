@@ -63,8 +63,8 @@ func main() {
 	api.Get("/user/alamat", authMiddleware, userHandler.GetMyAlamat)
 	api.Get("/user/alamat/:id", authMiddleware, userHandler.GetDetailAlamat)
 	api.Post("/user/alamat", authMiddleware, userHandler.CreateAlamatUser)
-	// api.Put("/user/alamat/:id", authMiddleware, userHandler.UpdateAlamatUser)
-	// api.Delete("/user/alamat/:id", authMiddleware, userHandler.DeleteAlamatUser)
+	api.Put("/user/alamat/:id", authMiddleware, userHandler.UpdateAlamatUser)
+	api.Delete("/user/alamat/:id", authMiddleware, userHandler.DeleteAlamatUser)
 
 	// province city
 	api.Get("/provcity/listprovincies", provinceCityHandler.GetListProvince)
