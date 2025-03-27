@@ -1,6 +1,6 @@
 .env
-uploads/products/*
-uploads/shop/*
+uploads/product_images/*
+uploads/shop_images/*
 
-!uploads/products/.gitignore
-!uploads/shop/.gitignore
+!uploads/product_images/.gitignore
+!uploads/shop_images/.gitignore
