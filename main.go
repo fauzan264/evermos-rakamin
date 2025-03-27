@@ -89,8 +89,8 @@ func main() {
 	// api.Get("/product", authMiddleware, productHandler.GetListProduct)
 	api.Get("/product/:id", authMiddleware, productHandler.GetDetailProduct)
 	api.Post("/product", authMiddleware, productHandler.CreateProduct)
-	// api.Put("/product/:id", authMiddleware, productHandler.UpdateProduct)
-	// api.Delete("/product/:id", authMiddleware, productHandler.DeleteProduct)
+	api.Put("/product/:id", authMiddleware, productHandler.UpdateProduct)
+	api.Delete("/product/:id", authMiddleware, productHandler.DeleteProduct)
 
 	// trx
 	// api.Get("/trx". trxHandler.GetListTRX)

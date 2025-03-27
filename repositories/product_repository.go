@@ -18,6 +18,9 @@ type ProductRepository interface {
 	CreateProduct(tx *gorm.DB, product model.Product) (model.Product, error)
 	CreatePhotosProduct(tx *gorm.DB, photos []model.PhotoProduct) ([]model.PhotoProduct, error)
 	CreateLogProduct(logProduct model.LogProduct) (model.LogProduct, error)
+	UpdateProduct(tx *gorm.DB, product model.Product) (model.Product, error)
+	DeleteProduct(tx *gorm.DB, id int) error
+	DeleteAllPhotosByProductID(tx *gorm.DB, id int) error
 }
 
 func NewProductRepository(db *gorm.DB) *productRepository {
@@ -91,4 +94,33 @@ func (r *productRepository) CreateLogProduct(logProduct model.LogProduct) (model
 	}
 
 	return logProduct, nil
+}
+
+func (r *productRepository) UpdateProduct(tx *gorm.DB, product model.Product) (model.Product, error) {
+	err := tx.Save(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (r *productRepository) DeleteProduct(tx *gorm.DB, id int) error {
+	var product model.Product
+	err := tx.Where("id = ?", id).Delete(&product).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *productRepository) DeleteAllPhotosByProductID(tx *gorm.DB, id int) error {
+	var photoProduct model.PhotoProduct
+	err := tx.Where("id_produk = ?", id).Delete(&photoProduct).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
