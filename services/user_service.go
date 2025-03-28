@@ -104,16 +104,10 @@ func (s *userService) GetMyAlamat(requestUser request.GetByUserIDRequest) ([]res
 		return []response.AddressResponse{}, err
 	}
 
-	var addressesResponse []response.AddressResponse
-	for _, address := range getMyAddress {
-		addressResponse := response.AddressResponse{
-			ID : address.ID,
-			JudulAlamat : address.JudulAlamat,
-			NamaPenerima : address.NamaPenerima,
-			NoTelp : address.NoTelp,
-			DetailAlamat : address.DetailAlamat,
-		}
-		addressesResponse = append(addressesResponse, addressResponse)
+	addressesResponse := response.ListAddressResponseFormatter(getMyAddress)
+
+	if len(addressesResponse) == 0 {
+		addressesResponse = []response.AddressResponse{}
 	}
 
 	return addressesResponse, nil
@@ -125,13 +119,8 @@ func (s *userService) GetAlamatUserByID(requestUser request.GetByUserIDRequest, 
 		return response.AddressResponse{}, err
 	}
 
-	addressResponse := response.AddressResponse{
-		ID : address.ID,
-		JudulAlamat : address.JudulAlamat,
-		NamaPenerima : address.NamaPenerima,
-		NoTelp : address.NoTelp,
-		DetailAlamat : address.DetailAlamat,
-	}
+	addressResponse := response.AddressResponseFormatter(address)
+
 	return addressResponse, nil
 }
 
@@ -150,13 +139,7 @@ func (s *userService) CreateAlamatUser(requestUser request.GetByUserIDRequest, r
 		return response.AddressResponse{}, err
 	}
 
-	addressResponse := response.AddressResponse{
-		ID : createAddress.ID,
-		JudulAlamat : createAddress.JudulAlamat,
-		NamaPenerima : createAddress. NamaPenerima,
-		NoTelp : createAddress.NoTelp,
-		DetailAlamat : createAddress.DetailAlamat,
-	}
+	addressResponse := response.AddressResponseFormatter(createAddress)
 
 	return addressResponse, nil
 }
@@ -167,7 +150,7 @@ func (s *userService) UpdateAlamatUser(requestUser request.GetByUserIDRequest,  
 		return response.AddressResponse{}, err
 	}
 
-	if getAddress.IDUser != requestID.ID {
+	if getAddress.IDUser != requestUser.ID {
 		return response.AddressResponse{}, constants.ErrUnauthorized
 	}
 
@@ -187,13 +170,7 @@ func (s *userService) UpdateAlamatUser(requestUser request.GetByUserIDRequest,  
 		return response.AddressResponse{}, err
 	}
 
-	addressResponse := response.AddressResponse{
-		ID : updateAddress.ID,
-		JudulAlamat : updateAddress.JudulAlamat,
-		NamaPenerima : updateAddress.NamaPenerima,
-		NoTelp : updateAddress.NoTelp,
-		DetailAlamat : updateAddress.DetailAlamat,
-	}
+	addressResponse := response.AddressResponseFormatter(updateAddress)
 
 	return addressResponse, nil
 }
