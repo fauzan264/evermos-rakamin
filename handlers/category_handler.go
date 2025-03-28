@@ -70,6 +70,35 @@ func (h *categoryHandler) GetDetailCategory(c *fiber.Ctx) error {
 func (h *categoryHandler) CreateCategory(c *fiber.Ctx) error {
 	var request request.CategoryRequest
 
+	authUser := c.Locals("authUser")
+	if authUser == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	if !user.IsAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
 	err := c.BodyParser(&request)
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
@@ -101,6 +130,35 @@ func (h *categoryHandler) CreateCategory(c *fiber.Ctx) error {
 func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
 	var requestID request.GetByCategoryIDRequest
 	var requestData request.CategoryRequest
+
+	authUser := c.Locals("authUser")
+	if authUser == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	if !user.IsAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
 
 	err := c.ParamsParser(&requestID)
 	if err != nil {
@@ -142,6 +200,35 @@ func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
 
 func (h *categoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	var request request.GetByCategoryIDRequest
+
+	authUser := c.Locals("authUser")
+	if authUser == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	if !user.IsAdmin {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
 
 	err := c.ParamsParser(&request)
 	if err != nil {
