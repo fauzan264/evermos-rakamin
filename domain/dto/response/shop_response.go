@@ -21,8 +21,8 @@ func ShopResponseFormatter(shop model.Toko) TokoResponse {
 
 func ListShopResponseFormatter(listShop []model.Toko) []TokoResponse {
 	var listShopResponse []TokoResponse
-	for _, trx := range listShop {
-		shopResponseFormatter := ShopResponseFormatter(trx)
+	for _, shop := range listShop {
+		shopResponseFormatter := ShopResponseFormatter(shop)
 		listShopResponse = append(listShopResponse, shopResponseFormatter)
 	}
 
