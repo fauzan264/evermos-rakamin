@@ -11,5 +11,6 @@ type LoginResponse struct {
 	Email				string				`json:"email"`
 	ProvinsiResponse	ProvinceResponse	`json:"id_provinsi"`
 	KotaResponse		CityResponse		`json:"id_kota"`
+	IsAdmin				bool				`json:"is_admin"`
 	Token				string				`json:"token"`
 }
