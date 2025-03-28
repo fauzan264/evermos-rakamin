@@ -33,8 +33,8 @@ func InitDatabase() *gorm.DB {
 		&model.Category{},
 		&model.Alamat{},
 		&model.Toko{},
-		&model.Trx{},
-		&model.DetailTrx{},
+		&model.TRX{},
+		&model.DetailTRX{},
 	)
 	if err != nil {
 		log.Fatal("Error: ", err.Error())
