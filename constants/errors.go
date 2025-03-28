@@ -11,6 +11,7 @@ var (
 	ErrInvalidToken = errors.New("Invalid token")
 	ErrUnauthorized = errors.New("Unauthorized")
 	ErrInvalidDateFormat = errors.New("Invalid date format. Use DD/MM/YYYY")
+	ErrInsufficient = errors.New("insufficient stock")
 )
 
 // province city
