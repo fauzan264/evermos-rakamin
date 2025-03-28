@@ -38,7 +38,7 @@ func main() {
 	categoryService := services.NewCategoryService(categoryRepository)
 	tokoService := services.NewTokoService(tokoRepository)
 	productService := services.NewProductService(productRepository, tokoRepository, categoryRepository)
-	trxService := services.NewTRXService(trxRepository)
+	trxService := services.NewTRXService(trxRepository, productRepository, alamatRepository, tokoRepository, categoryRepository)
 
 	// handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -95,7 +95,7 @@ func main() {
 	// trx
 	api.Get("/trx", authMiddleware, trxHandler.GetListTRX)
 	api.Get("/trx/:id", authMiddleware, trxHandler.GetDetailTRX)
-	// api.Post("/trx", trxHandler.CreatelTRX)
+	api.Post("/trx", authMiddleware, trxHandler.CreateTRX)
 
 	if err := router.Listen(":8000"); err != nil {
 		log.Println("Error: ", err)

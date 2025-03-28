@@ -1,22 +1,45 @@
 package services
 
 import (
+	"strconv"
+	"time"
+
+	"github.com/fauzan264/evermos-rakamin/constants"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
+	"github.com/fauzan264/evermos-rakamin/domain/model"
+	"github.com/fauzan264/evermos-rakamin/helpers"
 	"github.com/fauzan264/evermos-rakamin/repositories"
 )
 
 type TRXService interface {
 	GetListTRX(requestUser request.GetByUserIDRequest, requestData request.TRXListRequest) ([]response.TRXResponse, error)
 	GetDetailTRX(requestUser request.GetByUserIDRequest, requestID request.GetByTRXIDRequest) (response.TRXResponse, error)
+	CreateTRX(requestUser request.GetByUserIDRequest, requestData request.CreateTrxRequest) (response.TRXResponse, error)
 }
 
 type trxService struct {
-	repository repositories.TRXRepository
+	trxRepository repositories.TRXRepository
+	productRepository repositories.ProductRepository
+	addressRepository repositories.AlamatRepository
+	shopRepository repositories.TokoRepository
+	categoryRepository repositories.CategoryRepository
 }
 
-func NewTRXService(repository repositories.TRXRepository) *trxService {
-	return &trxService{repository}
+func NewTRXService(
+	trxRepository repositories.TRXRepository,
+	productRepository repositories.ProductRepository,
+	addressRepository repositories.AlamatRepository,
+	shopRepository repositories.TokoRepository,
+	categoryRepository repositories.CategoryRepository,
+) *trxService {
+	return &trxService{
+		trxRepository,
+		productRepository,
+		addressRepository,
+		shopRepository,
+		categoryRepository,
+	}
 }
 
 func (s *trxService) GetListTRX(requestUser request.GetByUserIDRequest, requestData request.TRXListRequest) ([]response.TRXResponse, error) {
@@ -24,7 +47,7 @@ func (s *trxService) GetListTRX(requestUser request.GetByUserIDRequest, requestD
 	limit := requestData.Limit
 	name := requestData.Search
 	
-	listTRX, err := s.repository.GetTRXByUserID(requestUser.ID, page, limit, name)
+	listTRX, err := s.trxRepository.GetTRXByUserID(requestUser.ID, page, limit, name)
 	if err != nil {
 		return []response.TRXResponse{}, err
 	}
@@ -33,166 +56,122 @@ func (s *trxService) GetListTRX(requestUser request.GetByUserIDRequest, requestD
 		return []response.TRXResponse{}, nil
 	}
 
-	var responseListTRX []response.TRXResponse
-	for _, trx := range listTRX {
-		trxAlamat := response.AddressResponse{
-			ID: trx.Alamat.ID,
-			JudulAlamat: trx.Alamat.JudulAlamat,
-			NamaPenerima: trx.Alamat.NamaPenerima,
-			NoTelp: trx.Alamat.NoTelp,
-			DetailAlamat: trx.Alamat.DetailAlamat,
-		}
+	listTRXResponse := response.ListTRXResponseFormatter(listTRX)
 
-		var listDetailTRX []response.DetailTrx
-		for _, detailTRX := range trx.DetailTRX {
-
-			productShop := response.TokoResponse{
-				ID: detailTRX.LogProduct.Toko.ID,
-				NamaToko: detailTRX.LogProduct.Toko.NamaToko,
-				URLFoto: detailTRX.LogProduct.Toko.URLFoto,
-			}
-
-			productCategory := response.CategoryResponse{
-				ID: detailTRX.LogProduct.Category.ID,
-				NamaCategory: detailTRX.LogProduct.Category.NamaCategory,
-				CreatedAt: &detailTRX.LogProduct.Category.CreatedAt,
-				UpdatedAt: &detailTRX.LogProduct.Category.UpdatedAt,
-			}
-
-			var productPhotos []response.PhotoProductResponse
-			for _, photo := range detailTRX.LogProduct.Produk.PhotosProduct {
-				productPhoto := response.PhotoProductResponse{
-					ID: photo.ID,
-					IDProduk: photo.IDProduk,
-					URL: photo.URL,
-				}
-
-				productPhotos = append(productPhotos, productPhoto)
-			}
-
-			product := response.LogProductResponse{
-				ID: detailTRX.LogProduct.ID,
-				NamaProduk: detailTRX.LogProduct.NamaProduk,
-				Slug: detailTRX.LogProduct.Slug,
-				HargaReseller: detailTRX.LogProduct.HargaReseller,
-				HargaKonsumen: detailTRX.LogProduct.HargaKonsumen,
-				Deskripsi: detailTRX.LogProduct.Deskripsi,
-				Toko: productShop,
-				Category: productCategory,
-				Photos: productPhotos,
-			}
-
-			shop := response.TokoResponse{
-				ID: detailTRX.Toko.ID,
-				NamaToko: detailTRX.Toko.NamaToko,
-				URLFoto: detailTRX.Toko.URLFoto,
-			}
-
-			dataDetailTRX := response.DetailTrx{
-				Product: product,
-				Toko: shop,
-				Kuantitas: detailTRX.Kuantitas,
-				HargaTotal: detailTRX.HargaTotal,
-			}
-
-			listDetailTRX = append(listDetailTRX, dataDetailTRX)
-		}
-
-
-		responseTRX := response.TRXResponse{
-			ID: trx.ID,
-			HargaTotal: trx.HargaTotal,
-			KodeInvoice: trx.KodeInvoice,
-			MethodBayar: trx.MethodBayar,
-			ShippingAddress: trxAlamat,
-			DetailTrx: listDetailTRX,
-		}
-
-		responseListTRX = append(responseListTRX, responseTRX)
-	}
-
-	return responseListTRX, nil
+	return listTRXResponse, nil
 }
 
 func (s *trxService) GetDetailTRX(requestUser request.GetByUserIDRequest, requestID request.GetByTRXIDRequest) (response.TRXResponse, error) {
-	trx, err := s.repository.GetTRXUserByID(requestUser.ID, requestID.ID)
+	trx, err := s.trxRepository.GetTRXUserByID(requestUser.ID, requestID.ID)
 	if err != nil {
 		return response.TRXResponse{}, err
 	}
 
-	trxAlamat := response.AddressResponse{
-		ID: trx.Alamat.ID,
-		JudulAlamat: trx.Alamat.JudulAlamat,
-		NamaPenerima: trx.Alamat.NamaPenerima,
-		NoTelp: trx.Alamat.NoTelp,
-		DetailAlamat: trx.Alamat.DetailAlamat,
-	}
+	trxResponse := response.TRXResponseFormatter(trx)
 
-	var listDetailTRX []response.DetailTrx
-	for _, detailTRX := range trx.DetailTRX {
+	return trxResponse, nil
+}
 
-		productShop := response.TokoResponse{
-			ID: detailTRX.LogProduct.Toko.ID,
-			NamaToko: detailTRX.LogProduct.Toko.NamaToko,
-			URLFoto: detailTRX.LogProduct.Toko.URLFoto,
+func (s *trxService) CreateTRX(requestUser request.GetByUserIDRequest, requestData request.CreateTrxRequest) (response.TRXResponse, error) {
+	var totalPrice int
+	var logProducts []model.LogProduct
+	var detailTRXs []model.DetailTRX
+	for _, detailTRX := range requestData.DetailTrxRequest {
+		product, err := s.productRepository.GetProductByID(requestUser.ID, detailTRX.IDProduk)
+		if err != nil {
+			return response.TRXResponse{}, err
 		}
 
-		productCategory := response.CategoryResponse{
-			ID: detailTRX.LogProduct.Category.ID,
-			NamaCategory: detailTRX.LogProduct.Category.NamaCategory,
-			CreatedAt: &detailTRX.LogProduct.Category.CreatedAt,
-			UpdatedAt: &detailTRX.LogProduct.Category.UpdatedAt,
+		if product.Stok < detailTRX.Kuantitas {
+			return response.TRXResponse{}, constants.ErrInsufficient
+		}
+		
+		logProduct := model.LogProduct{
+			IDProduk: product.ID,
+			NamaProduk: product.NamaProduk,
+			Slug: product.Slug,
+			HargaReseller: product.HargaReseller,
+			HargaKonsumen: product.HargaKonsumen,
+			Stock: detailTRX.Kuantitas,
+			Deskripsi: product.Deskripsi,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			IDToko: product.IDToko,
+			IDCategory: product.IDCategory,
 		}
 
-		var productPhotos []response.PhotoProductResponse
-		for _, photo := range detailTRX.LogProduct.Produk.PhotosProduct {
-			productPhoto := response.PhotoProductResponse{
-				ID: photo.ID,
-				IDProduk: photo.IDProduk,
-				URL: photo.URL,
-			}
+		logProducts = append(logProducts, logProduct)
+		hargaKonsumenInt, _ := strconv.Atoi(product.HargaKonsumen)
+		price := hargaKonsumenInt * detailTRX.Kuantitas
+		totalPrice += price
 
-			productPhotos = append(productPhotos, productPhoto)
-		}
-
-		product := response.LogProductResponse{
-			ID: detailTRX.LogProduct.ID,
-			NamaProduk: detailTRX.LogProduct.NamaProduk,
-			Slug: detailTRX.LogProduct.Slug,
-			HargaReseller: detailTRX.LogProduct.HargaReseller,
-			HargaKonsumen: detailTRX.LogProduct.HargaKonsumen,
-			Deskripsi: detailTRX.LogProduct.Deskripsi,
-			Toko: productShop,
-			Category: productCategory,
-			Photos: productPhotos,
-		}
-
-		shop := response.TokoResponse{
-			ID: detailTRX.Toko.ID,
-			NamaToko: detailTRX.Toko.NamaToko,
-			URLFoto: detailTRX.Toko.URLFoto,
-		}
-
-		dataDetailTRX := response.DetailTrx{
-			Product: product,
-			Toko: shop,
+		detailTRX := model.DetailTRX{
+			IDLogProduk: logProduct.ID,
+			IDToko: logProduct.IDToko,
 			Kuantitas: detailTRX.Kuantitas,
-			HargaTotal: detailTRX.HargaTotal,
+			HargaTotal: price,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+
+			LogProduct: logProduct,
 		}
 
-		listDetailTRX = append(listDetailTRX, dataDetailTRX)
+		detailTRXs = append(detailTRXs, detailTRX)
 	}
 
+	invoiceNumber := helpers.GenerateInvoiceNumber()
 
-	responseTRX := response.TRXResponse{
-		ID: trx.ID,
-		HargaTotal: trx.HargaTotal,
-		KodeInvoice: trx.KodeInvoice,
-		MethodBayar: trx.MethodBayar,
-		ShippingAddress: trxAlamat,
-		DetailTrx: listDetailTRX,
+	trx := model.TRX{
+		IDUser: requestUser.ID,
+		AlamatPengiriman: requestData.AlamatPengiriman,
+		HargaTotal: totalPrice,
+		KodeInvoice: invoiceNumber,
+		MethodBayar: requestData.MethodBayar,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+
+		DetailTRX: detailTRXs,
 	}
 
+	createTRX, err := s.trxRepository.CreateTRX(trx)
+	if err != nil {
+		return response.TRXResponse{}, err
+	}
 
-	return responseTRX, nil
+	trxResponse := response.TRXResponseFormatter(createTRX)
+	if trxResponse.ShippingAddress.ID == 0 {
+		shippingAddress, _ := s.addressRepository.GetAlamatByID(trx.AlamatPengiriman)
+		trxResponse.ShippingAddress.ID = shippingAddress.ID
+		trxResponse.ShippingAddress.JudulAlamat = shippingAddress.JudulAlamat
+		trxResponse.ShippingAddress.NamaPenerima = shippingAddress.NamaPenerima
+		trxResponse.ShippingAddress.NoTelp = shippingAddress.NoTelp
+		trxResponse.ShippingAddress.DetailAlamat = shippingAddress.DetailAlamat
+	}
+
+	var newDetailTRX []response.DetailTrx
+	for _, detailTRX := range trxResponse.DetailTrx {
+		if detailTRX.Toko.ID == 0 {
+			shop, _ := s.shopRepository.GetTokoByID(trx.AlamatPengiriman)
+			detailTRX.Toko.ID = shop.ID
+			detailTRX.Toko.NamaToko = shop.NamaToko
+			detailTRX.Toko.URLFoto = shop.URLFoto
+		}
+
+		if detailTRX.Product.Toko.ID == 0 {
+			shop, _ := s.shopRepository.GetTokoByID(trx.AlamatPengiriman)
+			detailTRX.Product.Toko.ID = shop.ID
+			detailTRX.Product.Toko.NamaToko = shop.NamaToko
+			detailTRX.Product.Toko.URLFoto = shop.URLFoto
+		}
+
+		// if detailTRX.Product.Category.ID == 0 {
+		// 	category, _ := s.categoryRepository.GetCategoryByID(trx.DetailTRX.)
+		// 	detailTRX.Product.Category.ID = category.ID
+		// 	detailTRX.Product.Category.NamaCategory = category.NamaCategory
+		// }
+		// newDetailTRX = append(newDetailTRX, detailTRX)
+	}
+	trxResponse.DetailTrx = newDetailTRX
+
+	return trxResponse, nil
 }

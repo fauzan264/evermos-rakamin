@@ -12,6 +12,7 @@ type trxRepository struct {
 type TRXRepository interface {
 	GetTRXByUserID(userID, page, limit int, search string) ([]model.TRX, error)
 	GetTRXUserByID(userID, id int) (model.TRX, error)
+	CreateTRX(trx model.TRX) (model.TRX, error)
 }
 
 func NewTRXRepository(db *gorm.DB) *trxRepository {
@@ -32,7 +33,7 @@ func (r *trxRepository) GetTRXByUserID(userID, page, limit int, search string) (
 	err := query.Preload("Alamat").
 				Preload("DetailTRX.LogProduct.Toko").
 				Preload("DetailTRX.LogProduct.Category").
-				Preload("DetailTRX.Produk.PhotosProduct").
+				Preload("DetailTRX.LogProduct.Produk.PhotosProduct").
 				Preload("DetailTRX.Toko").
 				Limit(limit).
 				Offset(offset).
@@ -54,6 +55,15 @@ func (r *trxRepository) GetTRXUserByID(userID, id int) (model.TRX, error) {
 				Preload("DetailTRX.Toko").
 				First(&trx).Error
 
+	if err != nil {
+		return trx, err
+	}
+
+	return trx, nil
+}
+
+func (r *trxRepository) CreateTRX(trx model.TRX) (model.TRX, error) {
+	err := r.db.Create(&trx).Error
 	if err != nil {
 		return trx, err
 	}
