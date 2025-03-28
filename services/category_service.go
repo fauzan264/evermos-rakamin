@@ -27,32 +27,24 @@ func NewCategoryService(repository repositories.CategoryRepository) *categorySer
 
 
 func (s *categoryService) GetListCategory() ([]response.CategoryResponse, error) {
-	getListCategory, err := s.repository.GetListCategory()
+	categories, err := s.repository.GetListCategory()
 	if err != nil {
 		return []response.CategoryResponse{}, err
 	}
 
-	var categoriesResponse []response.CategoryResponse
-	for _, category := range getListCategory {
-		categoryResponse := response.CategoryResponse{
-			ID: category.ID,
-			NamaCategory: category.NamaCategory,
-		}
-		categoriesResponse = append(categoriesResponse, categoryResponse)
-	}
-	return categoriesResponse, nil
+	listCategoryResponse := response.ListCategoryResponseFormatter(categories)
+	
+	return listCategoryResponse, nil
 }
 
 func (s *categoryService) GetDetailCategory(request request.GetByCategoryIDRequest) (response.CategoryResponse, error) {
-	GetDetailCategory, err := s.repository.GetCategoryByID(request.ID)
+	category, err := s.repository.GetCategoryByID(request.ID)
 	if err != nil {
 		return response.CategoryResponse{}, err
 	}
 
-	categoryResponse := response.CategoryResponse{
-		ID: GetDetailCategory.ID,
-		NamaCategory: GetDetailCategory.NamaCategory,
-	}
+	categoryResponse := response.CategoryResponseFormatter(category)
+
 	return categoryResponse, nil
 }
 
@@ -67,11 +59,7 @@ func (s *categoryService) CreateCategory(request request.CategoryRequest) (respo
 		return response.CategoryResponse{}, err
 	}
 
-	categoryResponse := response.CategoryResponse{
-		ID: createCategory.ID,
-		NamaCategory: createCategory.NamaCategory,
-		CreatedAt: &createCategory.CreatedAt,
-	}
+	categoryResponse := response.CategoryResponseFormatter(createCategory)
 	
 	return categoryResponse, nil
 }
@@ -91,10 +79,7 @@ func (s *categoryService) UpdateCategory(requestID request.GetByCategoryIDReques
 		return response.CategoryResponse{}, err
 	}
 
-	categoryResponse := response.CategoryResponse{
-		ID: updateCategory.ID,
-		NamaCategory: updateCategory.NamaCategory,
-	}
+	categoryResponse := response.CategoryResponseFormatter(updateCategory)
 	
 	return categoryResponse, nil
 }
