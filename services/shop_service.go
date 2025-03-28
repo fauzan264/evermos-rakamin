@@ -25,18 +25,14 @@ func NewTokoService(repository repositories.TokoRepository) *tokoService {
 }
 
 func (s *tokoService) GetMyToko(requestUser request.GetByUserIDRequest) (response.TokoResponse, error) {
-	getMyToko, err := s.repository.GetTokoByUserID(requestUser.ID)
+	shop, err := s.repository.GetTokoByUserID(requestUser.ID)
 	if err != nil {
 		return response.TokoResponse{}, err
 	}
 
-	tokoResponse := response.TokoResponse{
-		ID : getMyToko.ID,
-		NamaToko: getMyToko.NamaToko,
-		URLFoto: getMyToko.URLFoto,
-	}
+	shopResponse := response.ShopResponseFormatter(shop)
 
-	return tokoResponse, nil
+	return shopResponse, nil
 }
 
 func (s *tokoService) GetListToko(request request.TokoListRequest) (response.PaginatedResponse, error) {
@@ -44,44 +40,36 @@ func (s *tokoService) GetListToko(request request.TokoListRequest) (response.Pag
 	limit := request.Limit
 	name := request.Name
 
-	getListToko, err := s.repository.GetListToko(page, limit, name)
+	listShop, err := s.repository.GetListToko(page, limit, name)
 
-	var tokoResponse response.PaginatedResponse
+	var shopResponse response.PaginatedResponse
 
 	if err != nil {
-		return tokoResponse, err
+		return shopResponse, err
 	}
 
-	listToko := make([]response.TokoResponse, 0)
-	for _, toko := range getListToko {
-		dataToko := response.TokoResponse{
-			ID: toko.ID,
-			NamaToko: toko.NamaToko,
-			URLFoto: toko.URLFoto,
-		}
+	listShopFormatter := response.ListShopResponseFormatter(listShop)
 
-		listToko = append(listToko, dataToko)
+	if len(listShop) == 0 {
+		listShopFormatter = []response.TokoResponse{}
 	}
 
-	tokoResponse.Data = listToko
-	tokoResponse.Page = request.Page
-	tokoResponse.Limit = request.Limit
+	shopResponse.Data = listShopFormatter
+	shopResponse.Page = request.Page
+	shopResponse.Limit = request.Limit
 
-	return tokoResponse, nil
+	return shopResponse, nil
 }
 
 func (s *tokoService) GetTokoByID(requestID request.GetTokoByID) (response.TokoResponse, error) {
-	toko, err := s.repository.GetTokoByID(requestID.ID)
+	shop, err := s.repository.GetTokoByID(requestID.ID)
 	if err != nil {
 		return response.TokoResponse{}, err
 	}
 
-	tokoResponse := response.TokoResponse{
-		ID : toko.ID,
-		NamaToko : toko.NamaToko,
-		URLFoto : toko.URLFoto,
-	}
-	return tokoResponse, nil
+	shopResponse := response.ShopResponseFormatter(shop)
+	
+	return shopResponse, nil
 }
 
 func (s *tokoService) UpdateToko(
@@ -107,16 +95,12 @@ func (s *tokoService) UpdateToko(
 		toko.URLFoto = requestData.Photo
 	}
 
-	updateToko, err := s.repository.UpdateToko(toko)
+	updateShop, err := s.repository.UpdateToko(toko)
 	if err != nil {
 		return response.TokoResponse{}, err
 	}
 
-	responseToko := response.TokoResponse{
-		ID: updateToko.ID,
-		NamaToko: updateToko.NamaToko,
-		URLFoto: updateToko.URLFoto,
-	}
+	shopResponse := response.ShopResponseFormatter(updateShop)
 
-	return responseToko, nil
+	return shopResponse, nil
 }
