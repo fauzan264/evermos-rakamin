@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/model"
 	"gorm.io/gorm"
 )
@@ -13,7 +14,8 @@ type ProductRepository interface {
 	BeginTransaction() *gorm.DB
 	CommitTransaction(tx *gorm.DB)
 	RollbackTransaction(tx *gorm.DB)
-	GetProductByID(id int) (model.Product, error)
+	GetProductsByUserID(userID int, requestSearch request.ProductListRequest) ([]model.Product, error)
+	GetProductByID(userID int, id int) (model.Product, error)
 	GetPhotosProductByProductID(id int) ([]model.PhotoProduct, error)
 	CreateProduct(tx *gorm.DB, product model.Product) (model.Product, error)
 	CreatePhotosProduct(tx *gorm.DB, photos []model.PhotoProduct) ([]model.PhotoProduct, error)
@@ -39,11 +41,53 @@ func (r *productRepository) RollbackTransaction(tx *gorm.DB) {
 	tx.Rollback()
 }
 
-func (r *productRepository) GetProductByID(id int) (model.Product, error) {
+func (r *productRepository) GetProductsByUserID(userID int, requestSearch request.ProductListRequest) ([]model.Product, error) {
+	var listProduct []model.Product
+
+	offset := (requestSearch.Page - 1) * requestSearch.Limit
+
+	query := r.db.Model(&model.Product{})
+
+    if requestSearch.NameProduct != "" {
+		query = query.Where("nama_produk LIKE ?", "%"+ requestSearch.NameProduct +"%")
+	}
+
+    if requestSearch.IDCategory != nil {
+		query = query.Where("id_category = ?",  requestSearch.IDCategory)
+	}
+
+    if requestSearch.ShopID != nil {
+		query = query.Where("id_toko = ?", requestSearch.ShopID)
+	}
+
+    if requestSearch.MinPrice != nil {
+		query = query.Where("harga_konsumen >= ?", requestSearch.MinPrice)
+	}
+
+    if requestSearch.MaxPrice != nil {
+		query = query.Where("harga_konsumen <= ?", requestSearch.MaxPrice)
+	}
+
+	err := query.Preload("Toko", "id_user = ?", userID).
+				Preload("Category").
+				Preload("PhotosProduct").
+				Limit(requestSearch.Limit).
+				Offset(offset).
+				Find(&listProduct).Error
+
+	if err != nil {
+		return listProduct, err
+	}
+
+	return listProduct, nil
+}
+
+func (r *productRepository) GetProductByID(userID int, id int) (model.Product, error) {
 	var product model.Product
 
-	err := r.db.Preload("Category").
-				Preload("Toko").
+	err := r.db.Preload("Toko", "id_user = ?", userID).
+				Preload("Category").
+				Preload("PhotosProduct").
 				Where("id = ?", id).
 				First(&product).
 				Error

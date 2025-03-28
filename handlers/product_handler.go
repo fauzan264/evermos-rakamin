@@ -24,8 +24,93 @@ func NewProductHandler(productService services.ProductService) *productHandler {
 	return &productHandler{productService}
 }
 
+func (h *productHandler) GetListProduct(c *fiber.Ctx) error {
+	var requestUser request.GetByUserIDRequest
+	var requestData request.ProductListRequest
+
+	authUser := c.Locals("authUser")
+	if authUser == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser.ID = user.ID
+
+	err := c.QueryParser(&requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+	
+	if requestData.Page <= 0 {
+		requestData.Page = 1
+	}
+
+	if requestData.Limit <= 0 {
+		requestData.Limit = 1
+	}
+
+	productResponse, err := h.productService.GetListProduct(requestUser, requestData)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Response{
+		Status: true,
+		Message: constants.SuccessGetData,
+		Errors: nil,
+		Data: productResponse,
+	})
+}
+
 func (h *productHandler) GetDetailProduct(c *fiber.Ctx) error {
+	var requestUser request.GetByUserIDRequest
 	var requestID request.GetByProductIDRequest
+
+	authUser := c.Locals("authUser")
+	if authUser == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	user, ok := authUser.(response.UserResponse)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: []string{constants.ErrUnauthorized.Error()},
+			Data: nil,
+		})
+	}
+
+	requestUser.ID = user.ID
 
 	err := c.ParamsParser(&requestID)
 	if err != nil {
@@ -37,7 +122,7 @@ func (h *productHandler) GetDetailProduct(c *fiber.Ctx) error {
 		})
 	}
 
-	myTokoResponse, err := h.productService.GetProductByID(requestID)
+	myTokoResponse, err := h.productService.GetProductByID(requestUser, requestID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,

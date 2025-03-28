@@ -22,6 +22,7 @@ type Product struct {
 
 	Toko			Toko			`gorm:"foreignKey:IDToko;references:ID"`
 	Category		Category 		`gorm:"foreignKey:IDCategory;references:ID"`
+	PhotosProduct	[]PhotoProduct	`gorm:"foreignKey:IDProduk;references:ID"`
 }
 
 type LogProduct struct {
@@ -38,8 +39,8 @@ type LogProduct struct {
 	IDToko 			int				`gorm:"type:int;not null"`
 	IDCategory 		int				`gorm:"type:int;not null"`
 
-	Produk			Product			`gorm:"foreignKey:IDProduk;references:ID"`
 	Toko			Toko			`gorm:"foreignKey:IDToko;references:ID"`
+	Produk			Product			`gorm:"foreignKey:IDProduk;references:ID"`
 	Category		Category		`gorm:"foreignKey:IDCategory;references:ID"`
 }
 
@@ -50,7 +51,8 @@ type PhotoProduct struct {
 	CreatedAt 		time.Time		`gorm:"type:timestamp;not null;default:current_timestamp"`
 	UpdatedAt 		time.Time		`gorm:"type:timestamp"`
 
-	Produk 			Product			`gorm:"foreignKey:IDProduk;references:ID"`
+	Product 		Product			`gorm:"foreignKey:IDProduk;references:ID"`
+	LogProduct 		LogProduct		`gorm:"foreignKey:IDProduk;references:IDProduk"`
 }
 
 func (Product) TableName() string {
