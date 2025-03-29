@@ -1,6 +1,9 @@
 package response
 
-import "github.com/fauzan264/evermos-rakamin/domain/model"
+import (
+	"github.com/fauzan264/evermos-rakamin/domain/model"
+	"github.com/fauzan264/evermos-rakamin/helpers"
+)
 
 type TokoResponse struct {
 	ID       	int 		`json:"id"`
@@ -13,7 +16,7 @@ func ShopResponseFormatter(shop model.Toko) TokoResponse {
 	shopResponse := TokoResponse{
 		ID: shop.ID,
 		NamaToko: shop.NamaToko,
-		URLFoto: shop.URLFoto,
+		URLFoto: helpers.GetImageURL(shop.URLFoto),
 	}
 
 	return shopResponse
