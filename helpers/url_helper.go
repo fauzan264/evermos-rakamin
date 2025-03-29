@@ -21,6 +21,5 @@ func GetImageURL(path string) string {
 		return path
 	}
 
-	fmt.Println(fmt.Sprintf("%s/%s", baseURL, path))
 	return fmt.Sprintf("%s/%s", baseURL, path)
 }
