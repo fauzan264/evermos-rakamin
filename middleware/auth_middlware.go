@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"github.com/fauzan264/evermos-rakamin/constants"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
+	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
 	"github.com/fauzan264/evermos-rakamin/services"
 	"github.com/fauzan264/evermos-rakamin/utils"
 	"github.com/gofiber/fiber/v2"
@@ -44,7 +46,10 @@ func AuthMiddleware(userService services.UserService) fiber.Handler {
 }
 
 func sendUnauthorizedResponse(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		"error": "Unauthorized",
+	return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+		Status: false,
+		Message: constants.FailedGetData,
+		Errors: []string{constants.ErrUnauthorized.Error()},
+		Data: nil,
 	})
 }
