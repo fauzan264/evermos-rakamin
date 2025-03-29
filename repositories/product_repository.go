@@ -14,7 +14,7 @@ type ProductRepository interface {
 	BeginTransaction() *gorm.DB
 	CommitTransaction(tx *gorm.DB)
 	RollbackTransaction(tx *gorm.DB)
-	GetProductsByUserID(userID int, requestSearch request.ProductListRequest) ([]model.Product, error)
+	GetListProduct(requestSearch request.ProductListRequest) ([]model.Product, error)
 	GetProductByID(userID int, id int) (model.Product, error)
 	GetPhotosProductByProductID(id int) ([]model.PhotoProduct, error)
 	CreateProduct(tx *gorm.DB, product model.Product) (model.Product, error)
@@ -41,7 +41,7 @@ func (r *productRepository) RollbackTransaction(tx *gorm.DB) {
 	tx.Rollback()
 }
 
-func (r *productRepository) GetProductsByUserID(userID int, requestSearch request.ProductListRequest) ([]model.Product, error) {
+func (r *productRepository) GetListProduct(requestSearch request.ProductListRequest) ([]model.Product, error) {
 	var listProduct []model.Product
 
 	offset := (requestSearch.Page - 1) * requestSearch.Limit
@@ -68,12 +68,14 @@ func (r *productRepository) GetProductsByUserID(userID int, requestSearch reques
 		query = query.Where("harga_konsumen <= ?", requestSearch.MaxPrice)
 	}
 
-	err := query.Preload("Toko", "id_user = ?", userID).
+	query = query.Preload("Toko").
 				Preload("Category").
-				Preload("PhotosProduct").
-				Limit(requestSearch.Limit).
+				Preload("PhotosProduct")
+
+	err := query.Limit(requestSearch.Limit).
 				Offset(offset).
 				Find(&listProduct).Error
+
 
 	if err != nil {
 		return listProduct, err
