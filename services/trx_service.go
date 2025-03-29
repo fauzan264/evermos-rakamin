@@ -13,7 +13,7 @@ import (
 )
 
 type TRXService interface {
-	GetListTRX(requestUser request.GetByUserIDRequest, requestData request.TRXListRequest) ([]response.TRXResponse, error)
+	GetListTRX(requestUser request.GetByUserIDRequest, requestData request.TRXListRequest) (response.PaginatedResponse, error)
 	GetDetailTRX(requestUser request.GetByUserIDRequest, requestID request.GetByTRXIDRequest) (response.TRXResponse, error)
 	CreateTRX(requestUser request.GetByUserIDRequest, requestData request.CreateTrxRequest) (response.TRXResponse, error)
 }
@@ -42,23 +42,25 @@ func NewTRXService(
 	}
 }
 
-func (s *trxService) GetListTRX(requestUser request.GetByUserIDRequest, requestData request.TRXListRequest) ([]response.TRXResponse, error) {
-	page := requestData.Page
-	limit := requestData.Limit
-	name := requestData.Search
+func (s *trxService) GetListTRX(requestUser request.GetByUserIDRequest, requestSearch request.TRXListRequest) (response.PaginatedResponse, error) {
+	var trxResponse response.PaginatedResponse
 	
-	listTRX, err := s.trxRepository.GetTRXByUserID(requestUser.ID, page, limit, name)
+	listTRX, err := s.trxRepository.GetTRXByUserID(requestUser.ID, requestSearch)
 	if err != nil {
-		return []response.TRXResponse{}, err
-	}
-
-	if len(listTRX) == 0 {
-		return []response.TRXResponse{}, nil
+		return trxResponse, err
 	}
 
 	listTRXResponse := response.ListTRXResponseFormatter(listTRX)
 
-	return listTRXResponse, nil
+	if len(listTRX) == 0 {
+		listTRXResponse = []response.TRXResponse{}
+	}
+
+	trxResponse.Data = listTRXResponse
+	trxResponse.Page = requestSearch.Page
+	trxResponse.Limit = requestSearch.Limit
+
+	return trxResponse, nil
 }
 
 func (s *trxService) GetDetailTRX(requestUser request.GetByUserIDRequest, requestID request.GetByTRXIDRequest) (response.TRXResponse, error) {

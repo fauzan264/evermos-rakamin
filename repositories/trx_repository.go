@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/model"
 	"gorm.io/gorm"
 )
@@ -10,7 +11,7 @@ type trxRepository struct {
 }
 
 type TRXRepository interface {
-	GetTRXByUserID(userID, page, limit int, search string) ([]model.TRX, error)
+	GetTRXByUserID(userID int, requestSearch request.TRXListRequest) ([]model.TRX, error)
 	GetTRXUserByID(userID, id int) (model.TRX, error)
 	CreateTRX(trx model.TRX) (model.TRX, error)
 }
@@ -19,23 +20,26 @@ func NewTRXRepository(db *gorm.DB) *trxRepository {
 	return &trxRepository{db}
 }
 
-func (r *trxRepository) GetTRXByUserID(userID, page, limit int, search string) ([]model.TRX, error) {
+func (r *trxRepository) GetTRXByUserID(userID int, requestSearch request.TRXListRequest) ([]model.TRX, error) {
 	var listTRX []model.TRX
 
-	offset := (page - 1) * limit
+	offset := (requestSearch.Page - 1) * requestSearch.Limit
 
 	query := r.db.Model(&model.TRX{})
 
-	if search != "" {
-		query = query.Where("kode_invoice LIKE ?", "%"+ search +"%")
+	if requestSearch.Search != "" {
+		query = query.Where("kode_invoice LIKE ?", "%"+ requestSearch.Search +"%")
 	}
 
-	err := query.Preload("Alamat").
+	query = query.Where("id_user = ?", userID).
+				Preload("Alamat").
 				Preload("DetailTRX.LogProduct.Toko").
 				Preload("DetailTRX.LogProduct.Category").
 				Preload("DetailTRX.LogProduct.Produk.PhotosProduct").
-				Preload("DetailTRX.Toko").
-				Limit(limit).
+				Preload("DetailTRX.Toko")
+				
+				
+	err := query.Limit(requestSearch.Limit).
 				Offset(offset).
 				Find(&listTRX).Error
 
