@@ -6,6 +6,7 @@ import (
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
 	"github.com/fauzan264/evermos-rakamin/helpers"
 	"github.com/fauzan264/evermos-rakamin/services"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -46,7 +47,7 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedUpdateData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -57,6 +58,17 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 	err := c.BodyParser(&requestData)
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedUpdateData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+
+	validate := validator.New()
+	err = validate.Struct(requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedUpdateData,
 			Errors: helpers.FormatValidationError(err),
@@ -188,6 +200,17 @@ func (h *userHandler) CreateAddressUser(c *fiber.Ctx) error {
 		})
 	}
 
+	validate := validator.New()
+	err = validate.Struct(requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+	
 	addressResponse, err := h.userService.CreateAddressUser(requestUser, requestData)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
@@ -216,7 +239,7 @@ func (h *userHandler) UpdateAddressUser(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedUpdateData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -236,6 +259,17 @@ func (h *userHandler) UpdateAddressUser(c *fiber.Ctx) error {
 	err = c.BodyParser(&requestData)
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedUpdateData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+
+	validate := validator.New()
+	err = validate.Struct(requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedUpdateData,
 			Errors: helpers.FormatValidationError(err),
@@ -271,7 +305,7 @@ func (h *userHandler) DeleteAddressUser(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedDeleteData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})

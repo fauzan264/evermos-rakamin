@@ -136,7 +136,7 @@ func ( h *shopHandler) UpdateProfileShop(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedUpdateData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})

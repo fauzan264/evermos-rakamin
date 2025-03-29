@@ -6,6 +6,7 @@ import (
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
 	"github.com/fauzan264/evermos-rakamin/helpers"
 	"github.com/fauzan264/evermos-rakamin/services"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -25,7 +26,7 @@ func (h *trxHandler) GetListTRX(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -35,7 +36,7 @@ func (h *trxHandler) GetListTRX(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -88,7 +89,7 @@ func (h *trxHandler) GetDetailTRX(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedDeleteData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -133,7 +134,7 @@ func (h *trxHandler) CreateTRX(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -143,6 +144,17 @@ func (h *trxHandler) CreateTRX(c *fiber.Ctx) error {
 	err := c.BodyParser(&requestData)
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
+
+	validate := validator.New()
+	err = validate.Struct(requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedInsertData,
 			Errors: helpers.FormatValidationError(err),

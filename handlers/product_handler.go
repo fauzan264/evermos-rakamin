@@ -32,7 +32,7 @@ func (h *productHandler) GetListProduct(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -42,7 +42,7 @@ func (h *productHandler) GetListProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -94,7 +94,7 @@ func (h *productHandler) GetDetailProduct(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -104,7 +104,7 @@ func (h *productHandler) GetDetailProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -148,7 +148,7 @@ func (h *productHandler) CreateProduct(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -158,7 +158,7 @@ func (h *productHandler) CreateProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -264,7 +264,7 @@ func (h *productHandler) UpdateProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedUpdateData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -392,7 +392,7 @@ func (h *productHandler) DeleteProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedDeleteData,
+			Message: constants.FailedGetData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
