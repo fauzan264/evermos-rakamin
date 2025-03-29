@@ -6,8 +6,8 @@ type GetByProductIDRequest struct {
 
 type ProductListRequest struct {
 	NameProduct		string			`query:"nama_product"`
-	Page			int				`query:"limit"`
-	Limit			int				`query:"page"`
+	Page			int				`query:"page"`
+	Limit			int				`query:"limit"`
 	IDCategory		*int			`query:"category_id"`
 	ShopID			*int			`query:"toko_id"`
 	MinPrice		*int			`query:"max_harga"`
