@@ -65,7 +65,7 @@ func (h *productHandler) GetListProduct(c *fiber.Ctx) error {
 	}
 
 	if requestData.Limit <= 0 {
-		requestData.Limit = 1
+		requestData.Limit = 10
 	}
 
 	productResponse, err := h.productService.GetListProduct(requestUser, requestData)
