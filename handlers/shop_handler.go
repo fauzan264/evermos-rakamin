@@ -74,7 +74,7 @@ func (h *shopHandler) GetListShop(c *fiber.Ctx) error {
 	}
 
 	if request.Limit <= 0 {
-		request.Limit = 1
+		request.Limit = 10
 	}
 
 	shopResponse, err := h.shopService.GetListShop(request)
