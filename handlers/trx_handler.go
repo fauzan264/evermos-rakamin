@@ -58,7 +58,7 @@ func (h *trxHandler) GetListTRX(c *fiber.Ctx) error {
 	}
 
 	if requestData.Limit <= 0 {
-		requestData.Limit = 1
+		requestData.Limit = 10
 	}
 
 	trxResponse, err := h.trxService.GetListTRX(requestUser, requestData)
