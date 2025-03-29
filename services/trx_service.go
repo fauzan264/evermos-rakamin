@@ -76,6 +76,7 @@ func (s *trxService) CreateTRX(requestUser request.GetByUserIDRequest, requestDa
 	var totalPrice int
 	var logProducts []model.LogProduct
 	var detailTRXs []model.DetailTRX
+	var updateProducts []model.Product
 	for _, detailTRX := range requestData.DetailTrxRequest {
 		product, err := s.productRepository.GetProductByID(requestUser.ID, detailTRX.IDProduk)
 		if err != nil {
@@ -98,6 +99,10 @@ func (s *trxService) CreateTRX(requestUser request.GetByUserIDRequest, requestDa
 			UpdatedAt: time.Now(),
 			IDToko: product.IDToko,
 			IDCategory: product.IDCategory,
+
+			Toko: product.Toko,
+			Category: product.Category,
+			Produk: product,
 		}
 
 		logProducts = append(logProducts, logProduct)
@@ -114,12 +119,21 @@ func (s *trxService) CreateTRX(requestUser request.GetByUserIDRequest, requestDa
 			UpdatedAt: time.Now(),
 
 			LogProduct: logProduct,
+			Toko: product.Toko,
 		}
 
+		product.Stok -= detailTRX.Kuantitas
+
 		detailTRXs = append(detailTRXs, detailTRX)
+		updateProducts = append(updateProducts, product)
 	}
 
 	invoiceNumber := helpers.GenerateInvoiceNumber()
+
+	shippingAddress, err := s.addressRepository.GetAlamatByID(requestData.AlamatPengiriman)
+	if err != nil {
+		return response.TRXResponse{}, err
+	}
 
 	trx := model.TRX{
 		IDUser: requestUser.ID,
@@ -130,7 +144,8 @@ func (s *trxService) CreateTRX(requestUser request.GetByUserIDRequest, requestDa
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 
-		DetailTRX: detailTRXs,
+		Alamat: shippingAddress,
+		DetailTRX: detailTRXs,		
 	}
 
 	createTRX, err := s.trxRepository.CreateTRX(trx)
@@ -138,40 +153,13 @@ func (s *trxService) CreateTRX(requestUser request.GetByUserIDRequest, requestDa
 		return response.TRXResponse{}, err
 	}
 
+	tx := s.productRepository.BeginTransaction()
+	for _, updateProduct := range updateProducts {
+		_, _ = s.productRepository.UpdateProduct(tx, updateProduct)
+	}
+	tx.Commit()
+
 	trxResponse := response.TRXResponseFormatter(createTRX)
-	if trxResponse.ShippingAddress.ID == 0 {
-		shippingAddress, _ := s.addressRepository.GetAlamatByID(trx.AlamatPengiriman)
-		trxResponse.ShippingAddress.ID = shippingAddress.ID
-		trxResponse.ShippingAddress.JudulAlamat = shippingAddress.JudulAlamat
-		trxResponse.ShippingAddress.NamaPenerima = shippingAddress.NamaPenerima
-		trxResponse.ShippingAddress.NoTelp = shippingAddress.NoTelp
-		trxResponse.ShippingAddress.DetailAlamat = shippingAddress.DetailAlamat
-	}
-
-	var newDetailTRX []response.DetailTrx
-	for _, detailTRX := range trxResponse.DetailTrx {
-		if detailTRX.Toko.ID == 0 {
-			shop, _ := s.shopRepository.GetTokoByID(trx.AlamatPengiriman)
-			detailTRX.Toko.ID = shop.ID
-			detailTRX.Toko.NamaToko = shop.NamaToko
-			detailTRX.Toko.URLFoto = shop.URLFoto
-		}
-
-		if detailTRX.Product.Toko.ID == 0 {
-			shop, _ := s.shopRepository.GetTokoByID(trx.AlamatPengiriman)
-			detailTRX.Product.Toko.ID = shop.ID
-			detailTRX.Product.Toko.NamaToko = shop.NamaToko
-			detailTRX.Product.Toko.URLFoto = shop.URLFoto
-		}
-
-		// if detailTRX.Product.Category.ID == 0 {
-		// 	category, _ := s.categoryRepository.GetCategoryByID(trx.DetailTRX.)
-		// 	detailTRX.Product.Category.ID = category.ID
-		// 	detailTRX.Product.Category.NamaCategory = category.NamaCategory
-		// }
-		// newDetailTRX = append(newDetailTRX, detailTRX)
-	}
-	trxResponse.DetailTrx = newDetailTRX
 
 	return trxResponse, nil
 }
