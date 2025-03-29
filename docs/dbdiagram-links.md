@@ -1,0 +1,1 @@
+[EvermosRakaminDB - dbdiagram.io](https://dbdiagram.io/d/EvermosRakaminDB-67e772ae4f7afba184a33d8f)  
