@@ -9,25 +9,25 @@ import (
 	"github.com/fauzan264/evermos-rakamin/repositories"
 )
 
-type TokoService interface {
-	GetMyToko(requestUser request.GetByUserIDRequest) (response.TokoResponse, error)
-	GetListToko(request request.TokoListRequest) (response.PaginatedResponse, error)
-	GetTokoByID(requestID request.GetTokoByID) (response.TokoResponse, error)
-	UpdateToko(requestUser request.GetByUserIDRequest,  requestID request.GetTokoByID, requestData request.UpdateProfileShopRequest) (response.TokoResponse, error)
+type ShopService interface {
+	GetMyShop(requestUser request.GetByUserIDRequest) (response.ShopResponse, error)
+	GetListShop(request request.ShopListRequest) (response.PaginatedResponse, error)
+	GetShopByID(requestID request.GetShopByID) (response.ShopResponse, error)
+	UpdateShop(requestUser request.GetByUserIDRequest,  requestID request.GetShopByID, requestData request.UpdateProfileShopRequest) (response.ShopResponse, error)
 }
 
-type tokoService struct {
-	repository repositories.TokoRepository
+type shopService struct {
+	repository repositories.ShopRepository
 }
 
-func NewTokoService(repository repositories.TokoRepository) *tokoService {
-	return &tokoService{repository}
+func NewShopService(repository repositories.ShopRepository) *shopService {
+	return &shopService{repository}
 }
 
-func (s *tokoService) GetMyToko(requestUser request.GetByUserIDRequest) (response.TokoResponse, error) {
-	shop, err := s.repository.GetTokoByUserID(requestUser.ID)
+func (s *shopService) GetMyShop(requestUser request.GetByUserIDRequest) (response.ShopResponse, error) {
+	shop, err := s.repository.GetShopByUserID(requestUser.ID)
 	if err != nil {
-		return response.TokoResponse{}, err
+		return response.ShopResponse{}, err
 	}
 
 	shopResponse := response.ShopResponseFormatter(shop)
@@ -35,12 +35,12 @@ func (s *tokoService) GetMyToko(requestUser request.GetByUserIDRequest) (respons
 	return shopResponse, nil
 }
 
-func (s *tokoService) GetListToko(request request.TokoListRequest) (response.PaginatedResponse, error) {
+func (s *shopService) GetListShop(request request.ShopListRequest) (response.PaginatedResponse, error) {
 	page := request.Page
 	limit := request.Limit
 	name := request.Name
 
-	listShop, err := s.repository.GetListToko(page, limit, name)
+	listShop, err := s.repository.GetListShop(page, limit, name)
 
 	var shopResponse response.PaginatedResponse
 
@@ -51,7 +51,7 @@ func (s *tokoService) GetListToko(request request.TokoListRequest) (response.Pag
 	listShopFormatter := response.ListShopResponseFormatter(listShop)
 
 	if len(listShop) == 0 {
-		listShopFormatter = []response.TokoResponse{}
+		listShopFormatter = []response.ShopResponse{}
 	}
 
 	shopResponse.Data = listShopFormatter
@@ -61,10 +61,10 @@ func (s *tokoService) GetListToko(request request.TokoListRequest) (response.Pag
 	return shopResponse, nil
 }
 
-func (s *tokoService) GetTokoByID(requestID request.GetTokoByID) (response.TokoResponse, error) {
-	shop, err := s.repository.GetTokoByID(requestID.ID)
+func (s *shopService) GetShopByID(requestID request.GetShopByID) (response.ShopResponse, error) {
+	shop, err := s.repository.GetShopByID(requestID.ID)
 	if err != nil {
-		return response.TokoResponse{}, err
+		return response.ShopResponse{}, err
 	}
 
 	shopResponse := response.ShopResponseFormatter(shop)
@@ -72,32 +72,32 @@ func (s *tokoService) GetTokoByID(requestID request.GetTokoByID) (response.TokoR
 	return shopResponse, nil
 }
 
-func (s *tokoService) UpdateToko(
+func (s *shopService) UpdateShop(
 	requestUser request.GetByUserIDRequest,
-	requestID request.GetTokoByID,
+	requestID request.GetShopByID,
 	requestData request.UpdateProfileShopRequest,
-) (response.TokoResponse, error) {
-	toko, err := s.repository.GetTokoByID(requestID.ID)
+) (response.ShopResponse, error) {
+	shop, err := s.repository.GetShopByID(requestID.ID)
 	if err != nil {
-		return response.TokoResponse{}, err
+		return response.ShopResponse{}, err
 	}
 
-	if toko.IDUser != requestUser.ID {
-		return response.TokoResponse{}, constants.ErrUnauthorized
+	if shop.IDUser != requestUser.ID {
+		return response.ShopResponse{}, constants.ErrUnauthorized
 	}
 
-	toko.NamaToko = requestData.Nama
+	shop.NamaToko = requestData.Nama
 
 	if requestData.Photo != "" {
-		if toko.URLFoto != "" {
-			os.Remove(toko.URLFoto)
+		if shop.URLFoto != "" {
+			os.Remove(shop.URLFoto)
 		}
-		toko.URLFoto = requestData.Photo
+		shop.URLFoto = requestData.Photo
 	}
 
-	updateShop, err := s.repository.UpdateToko(toko)
+	updateShop, err := s.repository.UpdateShop(shop)
 	if err != nil {
-		return response.TokoResponse{}, err
+		return response.ShopResponse{}, err
 	}
 
 	shopResponse := response.ShopResponseFormatter(updateShop)

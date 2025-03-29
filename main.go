@@ -28,27 +28,27 @@ func main() {
 	// repositories
 	provinceCityRepository := repositories.NewProvinceCityRepository(provinceCityApiURL)
 	userRepository := repositories.NewUserRepository(db)
-	tokoRepository := repositories.NewTokoRepository(db)
+	shopRepository := repositories.NewShopRepository(db)
 	categoryRepository := repositories.NewCategoryRepository(db)
-	alamatRepository := repositories.NewAlamatRepository(db)
+	addressRepository := repositories.NewAddressRepository(db)
 	productRepository := repositories.NewProductRepository(db)
 	trxRepository := repositories.NewTRXRepository(db)
 
 	// services
-	authService := services.NewAuthService(userRepository, tokoRepository, provinceCityRepository)
-	userService := services.NewUserService(userRepository, alamatRepository)
+	authService := services.NewAuthService(userRepository, shopRepository, provinceCityRepository)
+	userService := services.NewUserService(userRepository, addressRepository)
 	provinceCityService := services.NewProvinceCityService(provinceCityRepository)
 	categoryService := services.NewCategoryService(categoryRepository)
-	tokoService := services.NewTokoService(tokoRepository)
-	productService := services.NewProductService(productRepository, tokoRepository, categoryRepository)
-	trxService := services.NewTRXService(trxRepository, productRepository, alamatRepository, tokoRepository, categoryRepository)
+	shopService := services.NewShopService(shopRepository)
+	productService := services.NewProductService(productRepository, shopRepository, categoryRepository)
+	trxService := services.NewTRXService(trxRepository, productRepository, addressRepository, shopRepository, categoryRepository)
 
 	// handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	userHandler := handlers.NewUserHandler(userService)
 	provinceCityHandler := handlers.NewProvinceCityHandler(provinceCityService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
-	tokoHandler := handlers.NewTokoHandler(tokoService)
+	shopHandler := handlers.NewShopHandler(shopService)
 	productHandler := handlers.NewProductHandler(productService)
 	trxHandler := handlers.NewTRXHandler(trxService)
 
@@ -63,11 +63,11 @@ func main() {
 	// user
 	api.Get("/user", authMiddleware, userHandler.GetMyProfile)
 	api.Put("/user", authMiddleware, userHandler.UpdateProfile)
-	api.Get("/user/alamat", authMiddleware, userHandler.GetMyAlamat)
-	api.Get("/user/alamat/:id", authMiddleware, userHandler.GetDetailAlamat)
-	api.Post("/user/alamat", authMiddleware, userHandler.CreateAlamatUser)
-	api.Put("/user/alamat/:id", authMiddleware, userHandler.UpdateAlamatUser)
-	api.Delete("/user/alamat/:id", authMiddleware, userHandler.DeleteAlamatUser)
+	api.Get("/user/alamat", authMiddleware, userHandler.GetMyAddress)
+	api.Get("/user/alamat/:id", authMiddleware, userHandler.GetDetailAddress)
+	api.Post("/user/alamat", authMiddleware, userHandler.CreateAddressUser)
+	api.Put("/user/alamat/:id", authMiddleware, userHandler.UpdateAddressUser)
+	api.Delete("/user/alamat/:id", authMiddleware, userHandler.DeleteAddressUser)
 
 	// province city
 	api.Get("/provcity/listprovincies", provinceCityHandler.GetListProvince)
@@ -83,10 +83,10 @@ func main() {
 	api.Delete("/category/:id", authMiddleware, categoryHandler.DeleteCategory)
 
 	// toko
-	api.Get("/toko/my", authMiddleware, tokoHandler.MyToko)
-	api.Get("/toko", authMiddleware, tokoHandler.GetListToko)
-	api.Get("/toko/:id_toko", authMiddleware, tokoHandler.GetDetailToko)
-	api.Put("/toko/:id_toko", authMiddleware, tokoHandler.UpdateProfileToko)
+	api.Get("/toko/my", authMiddleware, shopHandler.MyShop)
+	api.Get("/toko", authMiddleware, shopHandler.GetListShop)
+	api.Get("/toko/:id_toko", authMiddleware, shopHandler.GetDetailShop)
+	api.Put("/toko/:id_toko", authMiddleware, shopHandler.UpdateProfileShop)
 
 	// product
 	api.Get("/product", authMiddleware, productHandler.GetListProduct)

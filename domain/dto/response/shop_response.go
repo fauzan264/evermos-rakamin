@@ -5,15 +5,15 @@ import (
 	"github.com/fauzan264/evermos-rakamin/helpers"
 )
 
-type TokoResponse struct {
+type ShopResponse struct {
 	ID       	int 		`json:"id"`
 	NamaToko 	string 		`json:"nama_toko"`
 	URLFoto  	string 		`json:"url_foto"`
 }
 
 
-func ShopResponseFormatter(shop model.Toko) TokoResponse {
-	shopResponse := TokoResponse{
+func ShopResponseFormatter(shop model.Shop) ShopResponse {
+	shopResponse := ShopResponse{
 		ID: shop.ID,
 		NamaToko: shop.NamaToko,
 		URLFoto: helpers.GetImageURL(shop.URLFoto),
@@ -22,8 +22,8 @@ func ShopResponseFormatter(shop model.Toko) TokoResponse {
 	return shopResponse
 }
 
-func ListShopResponseFormatter(listShop []model.Toko) []TokoResponse {
-	var listShopResponse []TokoResponse
+func ListShopResponseFormatter(listShop []model.Shop) []ShopResponse {
+	var listShopResponse []ShopResponse
 	for _, shop := range listShop {
 		shopResponseFormatter := ShopResponseFormatter(shop)
 		listShopResponse = append(listShopResponse, shopResponseFormatter)

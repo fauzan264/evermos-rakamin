@@ -5,24 +5,24 @@ import (
 	"gorm.io/gorm"
 )
 
-type tokoRepository struct {
+type shopRepository struct {
 	db *gorm.DB
 }
 
-type TokoRepository interface {
-	CreateToko(toko model.Toko) error
-	GetListToko(page, limit int, name string) ([]model.Toko, error)
-	GetTokoByID(id int) (model.Toko, error)
-	GetTokoByUserID(userID int) (model.Toko, error)
-	UpdateToko(toko model.Toko) (model.Toko, error)
+type ShopRepository interface {
+	CreateShop(shop model.Shop) error
+	GetListShop(page, limit int, name string) ([]model.Shop, error)
+	GetShopByID(id int) (model.Shop, error)
+	GetShopByUserID(userID int) (model.Shop, error)
+	UpdateShop(shop model.Shop) (model.Shop, error)
 }
 
-func NewTokoRepository(db *gorm.DB) *tokoRepository {
-	return &tokoRepository{db}
+func NewShopRepository(db *gorm.DB) *shopRepository {
+	return &shopRepository{db}
 }
 
-func (r *tokoRepository) CreateToko(toko model.Toko) error {
-	err := r.db.Create(&toko).Error
+func (r *shopRepository) CreateShop(shop model.Shop) error {
+	err := r.db.Create(&shop).Error
 	if err != nil {
 		return err
 	}
@@ -30,12 +30,12 @@ func (r *tokoRepository) CreateToko(toko model.Toko) error {
 	return nil
 }
 
-func (r *tokoRepository) GetListToko(page, limit int, name string) ([]model.Toko, error) {
-	var listToko []model.Toko
+func (r *shopRepository) GetListShop(page, limit int, name string) ([]model.Shop, error) {
+	var listShop []model.Shop
 
 	offset := (page - 1) * limit
 
-	query := r.db.Model(&model.Toko{})
+	query := r.db.Model(&model.Shop{})
 
 	if name != "" {
 		query = query.Where("nama_toko LIKE ?", "%"+name+"%")
@@ -43,40 +43,40 @@ func (r *tokoRepository) GetListToko(page, limit int, name string) ([]model.Toko
 
 	err := query.Limit(limit).
 		Offset(offset).
-		Find(&listToko).Error
+		Find(&listShop).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return listToko, nil
+	return listShop, nil
 }
 
-func (r *tokoRepository) GetTokoByID(id int) (model.Toko, error) {
-	var toko model.Toko
-	err := r.db.Where("id = ?", id).First(&toko).Error
+func (r *shopRepository) GetShopByID(id int) (model.Shop, error) {
+	var shop model.Shop
+	err := r.db.Where("id = ?", id).First(&shop).Error
 	if err != nil {
-		return toko, err
+		return shop, err
 	}
 
-	return toko, nil
+	return shop, nil
 }
 
-func (r *tokoRepository) GetTokoByUserID(userID int) (model.Toko, error) {
-	var toko model.Toko
-	err := r.db.Where("id_user = ?", userID).First(&toko).Error
+func (r *shopRepository) GetShopByUserID(userID int) (model.Shop, error) {
+	var shop model.Shop
+	err := r.db.Where("id_user = ?", userID).First(&shop).Error
 	if err != nil {
-		return toko, err
+		return shop, err
 	}
 	
-	return toko, nil
+	return shop, nil
 }
 
-func (r *tokoRepository) UpdateToko(toko model.Toko) (model.Toko, error) {
-	err := r.db.Save(&toko).Error
+func (r *shopRepository) UpdateShop(shop model.Shop) (model.Shop, error) {
+	err := r.db.Save(&shop).Error
 	if err != nil {
-		return toko, err
+		return shop, err
 	}
 
-	return toko, nil
+	return shop, nil
 }

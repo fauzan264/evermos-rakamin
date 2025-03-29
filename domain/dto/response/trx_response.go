@@ -13,7 +13,7 @@ type TRXResponse struct {
 
 type DetailTrx struct {
 	Product    			LogProductResponse 			`json:"product"`
-	Toko       			TokoResponse    			`json:"toko"`
+	Toko       			ShopResponse    			`json:"toko"`
 	Kuantitas  			int     					`json:"kuantitas"`
 	HargaTotal 			int     					`json:"harga_total"`
 }

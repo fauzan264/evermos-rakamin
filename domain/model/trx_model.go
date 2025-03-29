@@ -12,7 +12,7 @@ type TRX struct {
 	CreatedAt 			time.Time		`gorm:"type:timestamp;not null:default:current_timestamp"`
 	UpdatedAt 			time.Time		`gorm:"type:timestamp"`
 
-	Alamat				Alamat			`gorm:"foreignKey:AlamatPengiriman;references:ID"`
+	Alamat				Address			`gorm:"foreignKey:AlamatPengiriman;references:ID"`
 	User				User			`gorm:"foreignKey:IDUser;references:ID"`
 	DetailTRX   		[]DetailTRX 	`gorm:"foreignKey:IDTrx;references:ID"`
 }
@@ -28,7 +28,7 @@ type DetailTRX struct {
 	UpdatedAt 			time.Time		`gorm:"type:timestamp"`
 
 	LogProduct			LogProduct		`gorm:"foreignKey:IDLogProduk;references:ID"`
-	Toko				Toko			`gorm:"foreignKey:IDToko;references:ID"`
+	Toko				Shop			`gorm:"foreignKey:IDToko;references:ID"`
 }
 
 func (TRX) TableName() string {

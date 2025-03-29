@@ -82,7 +82,7 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 	})
 }
 
-func (h *userHandler) GetMyAlamat(c *fiber.Ctx) error {
+func (h *userHandler) GetMyAddress(c *fiber.Ctx) error {
 	var requestUser request.GetByUserIDRequest
 
 	authUser := c.Locals("authUser")
@@ -98,7 +98,7 @@ func (h *userHandler) GetMyAlamat(c *fiber.Ctx) error {
 
 	requestUser.ID = user.ID
 
-	myAlamatResponse, err := h.userService.GetMyAlamat(requestUser)
+	myAddressResponse, err := h.userService.GetMyAddress(requestUser)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
@@ -112,11 +112,11 @@ func (h *userHandler) GetMyAlamat(c *fiber.Ctx) error {
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
-		Data: myAlamatResponse,
+		Data: myAddressResponse,
 	})
 }
 
-func (h *userHandler) GetDetailAlamat(c *fiber.Ctx) error {
+func (h *userHandler) GetDetailAddress(c *fiber.Ctx) error {
 	var requestUser request.GetByUserIDRequest
 	var requestID request.GetByAddressIDRequest
 
@@ -143,7 +143,7 @@ func (h *userHandler) GetDetailAlamat(c *fiber.Ctx) error {
 		})
 	}
 
-	myAlamatResponse, err := h.userService.GetAlamatUserByID(requestUser, requestID)
+	myAddressResponse, err := h.userService.GetAddressUserByID(requestUser, requestID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
@@ -157,11 +157,11 @@ func (h *userHandler) GetDetailAlamat(c *fiber.Ctx) error {
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
-		Data: myAlamatResponse,
+		Data: myAddressResponse,
 	})
 }
 
-func (h *userHandler) CreateAlamatUser(c *fiber.Ctx) error {
+func (h *userHandler) CreateAddressUser(c *fiber.Ctx) error {
 	var requestUser request.GetByUserIDRequest
 	var requestData request.CreateAddressRequest
 
@@ -188,7 +188,7 @@ func (h *userHandler) CreateAlamatUser(c *fiber.Ctx) error {
 		})
 	}
 
-	addressResponse, err := h.userService.CreateAlamatUser(requestUser, requestData)
+	addressResponse, err := h.userService.CreateAddressUser(requestUser, requestData)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
@@ -206,7 +206,7 @@ func (h *userHandler) CreateAlamatUser(c *fiber.Ctx) error {
 	})
 }
 
-func (h *userHandler) UpdateAlamatUser(c *fiber.Ctx) error {
+func (h *userHandler) UpdateAddressUser(c *fiber.Ctx) error {
 	var requestUser request.GetByUserIDRequest
 	var requestID request.GetByAddressIDRequest
 	var requestData request.UpdateAddressRequest
@@ -243,7 +243,7 @@ func (h *userHandler) UpdateAlamatUser(c *fiber.Ctx) error {
 		})
 	}
 
-	addressResponse, err := h.userService.UpdateAlamatUser(requestUser, requestID, requestData)
+	addressResponse, err := h.userService.UpdateAddressUser(requestUser, requestID, requestData)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
@@ -262,7 +262,7 @@ func (h *userHandler) UpdateAlamatUser(c *fiber.Ctx) error {
 	
 }
 
-func (h *userHandler) DeleteAlamatUser(c *fiber.Ctx) error {
+func (h *userHandler) DeleteAddressUser(c *fiber.Ctx) error {
 	var requestUser request.GetByUserIDRequest
 	var requestID request.GetByAddressIDRequest
 
@@ -289,7 +289,7 @@ func (h *userHandler) DeleteAlamatUser(c *fiber.Ctx) error {
 		})
 	}
 
-	err = h.userService.DeleteAlamatUser(requestUser, requestID)
+	err = h.userService.DeleteAddressUser(requestUser, requestID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,

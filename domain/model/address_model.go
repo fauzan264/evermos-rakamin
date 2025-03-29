@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type Alamat struct {
+type Address struct {
 	ID 				int				`gorm:"type:int;primaryKey;autoIncrement"`
 	IDUser 			int				`gorm:"type:int"`
 	JudulAlamat 	string			`gorm:"type:varchar(255);not null"`
@@ -15,6 +15,6 @@ type Alamat struct {
 	User			User			`gorm:"foreignKey:IDUser;references:ID"`
 }
 
-func (Alamat) TableName() string {
+func (Address) TableName() string {
 	return "alamat"
 }

@@ -5,74 +5,74 @@ import (
 	"gorm.io/gorm"
 )
 
-type alamatRepository struct {
+type addressRepository struct {
 	db *gorm.DB
 }
 
-type AlamatRepository interface {
-	CreateAlamat(alamat model.Alamat) (model.Alamat, error)
-	GetAlamatByID(id int) (model.Alamat, error)
-	GetAlamatByUserID(userID int) ([]model.Alamat, error)
-	GetAlamatUserByID(userID int, id int) (model.Alamat, error)
-	UpdateAlamat(alamat model.Alamat) (model.Alamat, error)
-	DeleteAlamat(id int) error
+type AddressRepository interface {
+	CreateAddress(address model.Address) (model.Address, error)
+	GetAddressByID(id int) (model.Address, error)
+	GetAddressByUserID(userID int) ([]model.Address, error)
+	GetAddressUserByID(userID int, id int) (model.Address, error)
+	UpdateAddress(address model.Address) (model.Address, error)
+	DeleteAddress(id int) error
 }
 
-func NewAlamatRepository(db *gorm.DB) *alamatRepository {
-	return &alamatRepository{db}
+func NewAddressRepository(db *gorm.DB) *addressRepository {
+	return &addressRepository{db}
 }
 
-func (r *alamatRepository) CreateAlamat(alamat model.Alamat) (model.Alamat, error) {
-	err := r.db.Create(&alamat).Error
+func (r *addressRepository) CreateAddress(address model.Address) (model.Address, error) {
+	err := r.db.Create(&address).Error
 	if err != nil {
-		return alamat, err
+		return address, err
 	}
 
-	return alamat, nil
+	return address, nil
 }
 
-func (r *alamatRepository) GetAlamatByID(id int) (model.Alamat, error) {
-	var alamat model.Alamat
-	err := r.db.Where("id = ?", id).First(&alamat).Error
+func (r *addressRepository) GetAddressByID(id int) (model.Address, error) {
+	var address model.Address
+	err := r.db.Where("id = ?", id).First(&address).Error
 	if err != nil {
-		return alamat, err
+		return address, err
 	}
 
-	return alamat, nil
+	return address, nil
 }
 
-func (r *alamatRepository) GetAlamatByUserID(userID int) ([]model.Alamat, error) {
-	var alamat []model.Alamat
-	err := r.db.Where("id_user = ?", userID).Find(&alamat).Error
+func (r *addressRepository) GetAddressByUserID(userID int) ([]model.Address, error) {
+	var address []model.Address
+	err := r.db.Where("id_user = ?", userID).Find(&address).Error
 	if err != nil {
-		return alamat, err
+		return address, err
 	}
 
-	return alamat, nil
+	return address, nil
 }
 
-func (r *alamatRepository) GetAlamatUserByID(userID int, id int) (model.Alamat, error) {
-	var alamat model.Alamat
-	err := r.db.Where("id_user = ? and id = ?", userID, id).First(&alamat).Error
+func (r *addressRepository) GetAddressUserByID(userID int, id int) (model.Address, error) {
+	var address model.Address
+	err := r.db.Where("id_user = ? and id = ?", userID, id).First(&address).Error
 	if err != nil {
-		return alamat, err
+		return address, err
 	}
 
-	return alamat, nil
+	return address, nil
 }
 
-func (r *alamatRepository) UpdateAlamat(alamat model.Alamat) (model.Alamat, error) {
-	err := r.db.Save(&alamat).Error
+func (r *addressRepository) UpdateAddress(address model.Address) (model.Address, error) {
+	err := r.db.Save(&address).Error
 	if err != nil {
-		return alamat, err
+		return address, err
 	}
 
-	return alamat, nil
+	return address, nil
 }
 
-func (r *alamatRepository) DeleteAlamat(id int) error {
-	var alamat model.Alamat
-	err := r.db.Where("id = ?", id).Delete(&alamat).Error
+func (r *addressRepository) DeleteAddress(id int) error {
+	var address model.Address
+	err := r.db.Where("id = ?", id).Delete(&address).Error
 	if err != nil {
 		return err
 	}

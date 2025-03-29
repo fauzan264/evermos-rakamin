@@ -1,10 +1,10 @@
 package request
 
-type GetTokoByID struct {
+type GetShopByID struct {
 	ID				int 		`params:"id_toko" validate:"required"`
 }
 
-type TokoListRequest struct {
+type ShopListRequest struct {
 	Page			int			`query:"page"`
 	Limit			int			`query:"limit"`
 	Name			string		`query:"nama"`

@@ -19,18 +19,18 @@ type AuthService interface {
 
 type authService struct {
 	repository repositories.UserRepository
-	tokoRepository repositories.TokoRepository
+	shopRepository repositories.ShopRepository
 	provinceCityRepository repositories.ProvinceCityRepository
 }
 
 func NewAuthService(
 	repository repositories.UserRepository,
-	tokoRepository repositories.TokoRepository,
+	shopRepository repositories.ShopRepository,
 	provinceCityRepository repositories.ProvinceCityRepository,
 ) *authService {
 	return &authService{
 		repository,
-		tokoRepository,
+		shopRepository,
 		provinceCityRepository,
 	}
 }
@@ -62,11 +62,11 @@ func (s *authService) RegisterUser(request request.RegisterRequest) (error) {
 		return err
 	}
 	
-	toko := model.Toko{
+	shop := model.Shop{
 		IDUser: newUser.ID,
 	}
 	
-	err = s.tokoRepository.CreateToko(toko)
+	err = s.shopRepository.CreateShop(shop)
 	if err != nil {
 		return err
 	}

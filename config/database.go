@@ -31,8 +31,8 @@ func InitDatabase() *gorm.DB {
 		&model.PhotoProduct{},
 		&model.LogProduct{},
 		&model.Category{},
-		&model.Alamat{},
-		&model.Toko{},
+		&model.Address{},
+		&model.Shop{},
 		&model.TRX{},
 		&model.DetailTRX{},
 	)

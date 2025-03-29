@@ -20,7 +20,7 @@ type Product struct {
 	IDToko 			int				`gorm:"type:int;not null"`
 	IDCategory 		int				`gorm:"type:int;not null"`
 
-	Toko			Toko			`gorm:"foreignKey:IDToko;references:ID"`
+	Toko			Shop			`gorm:"foreignKey:IDToko;references:ID"`
 	Category		Category 		`gorm:"foreignKey:IDCategory;references:ID"`
 	PhotosProduct	[]PhotoProduct	`gorm:"foreignKey:IDProduk;references:ID"`
 }
@@ -39,7 +39,7 @@ type LogProduct struct {
 	IDToko 			int				`gorm:"type:int;not null"`
 	IDCategory 		int				`gorm:"type:int;not null"`
 
-	Toko			Toko			`gorm:"foreignKey:IDToko;references:ID"`
+	Toko			Shop			`gorm:"foreignKey:IDToko;references:ID"`
 	Produk			Product			`gorm:"foreignKey:IDProduk;references:ID"`
 	Category		Category		`gorm:"foreignKey:IDCategory;references:ID"`
 }

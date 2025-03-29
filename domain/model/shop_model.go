@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type Toko struct {
+type Shop struct {
 	ID 			int				`gorm:"type:int;primaryKey;autoIncrement"`
 	IDUser 		int				`gorm:"type:int;not null"`
 	NamaToko 	string			`gorm:"type:varchar(255)"`
@@ -13,6 +13,6 @@ type Toko struct {
 	User		User			`gorm:"foreignKey:IDUser;references:ID"`
 }
 
-func (Toko) TableName() string {
+func (Shop) TableName() string {
 	return "toko"
 }

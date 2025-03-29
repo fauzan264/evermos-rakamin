@@ -10,9 +10,7 @@ type AddressResponse struct {
 	DetailAlamat 	string			`json:"detail_alamat"`
 }
 
-
-
-func AddressResponseFormatter(address model.Alamat) AddressResponse {
+func AddressResponseFormatter(address model.Address) AddressResponse {
 	addressResponse := AddressResponse{
 		ID : address.ID,
 		JudulAlamat : address.JudulAlamat,
@@ -24,7 +22,7 @@ func AddressResponseFormatter(address model.Alamat) AddressResponse {
 	return addressResponse
 }
 
-func ListAddressResponseFormatter(listAddress []model.Alamat) []AddressResponse {
+func ListAddressResponseFormatter(listAddress []model.Address) []AddressResponse {
 	var listAddressResponse []AddressResponse
 	for _, address := range listAddress {
 		addressResponseFormatter := AddressResponseFormatter(address)

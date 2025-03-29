@@ -21,16 +21,16 @@ type TRXService interface {
 type trxService struct {
 	trxRepository repositories.TRXRepository
 	productRepository repositories.ProductRepository
-	addressRepository repositories.AlamatRepository
-	shopRepository repositories.TokoRepository
+	addressRepository repositories.AddressRepository
+	shopRepository repositories.ShopRepository
 	categoryRepository repositories.CategoryRepository
 }
 
 func NewTRXService(
 	trxRepository repositories.TRXRepository,
 	productRepository repositories.ProductRepository,
-	addressRepository repositories.AlamatRepository,
-	shopRepository repositories.TokoRepository,
+	addressRepository repositories.AddressRepository,
+	shopRepository repositories.ShopRepository,
 	categoryRepository repositories.CategoryRepository,
 ) *trxService {
 	return &trxService{
@@ -130,7 +130,7 @@ func (s *trxService) CreateTRX(requestUser request.GetByUserIDRequest, requestDa
 
 	invoiceNumber := helpers.GenerateInvoiceNumber()
 
-	shippingAddress, err := s.addressRepository.GetAlamatByID(requestData.AlamatPengiriman)
+	shippingAddress, err := s.addressRepository.GetAddressByID(requestData.AlamatPengiriman)
 	if err != nil {
 		return response.TRXResponse{}, err
 	}

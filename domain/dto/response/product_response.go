@@ -8,7 +8,7 @@ type ProductResponse struct {
 	HargaKonsumen	string					`json:"harga_konsumen"`
 	Stok			int						`json:"stok"`
 	Deskripsi		string					`json:"deskripsi"`
-	Toko			TokoResponse			`json:"toko"`
+	Toko			ShopResponse			`json:"toko"`
 	Category		CategoryResponse		`json:"category"`
 	Photos			[]PhotoProductResponse	`json:"photos"`
 }
@@ -26,7 +26,7 @@ type LogProductResponse struct {
 	HargaReseller	string					`json:"harga_reseller"`
 	HargaKonsumen	string					`json:"harga_konsumen"`
 	Deskripsi		string					`json:"deskripsi"`
-	Toko			TokoResponse			`json:"toko"`
+	Toko			ShopResponse			`json:"toko"`
 	Category		CategoryResponse		`json:"category"`
 	Photos			[]PhotoProductResponse	`json:"photos"`
 }

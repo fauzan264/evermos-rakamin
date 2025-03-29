@@ -13,21 +13,21 @@ import (
 
 type userService struct {
 	repository repositories.UserRepository
-	alamatRepository repositories.AlamatRepository
+	addressRepository repositories.AddressRepository
 }
 
 type UserService interface {
 	GetUserByID(request request.GetByUserIDRequest) (response.UserResponse, error)
 	UpdateUser(requestID request.GetByUserIDRequest, requestData request.UpdateProfileRequest) (response.UserResponse, error)
-	GetMyAlamat(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error)
-	GetAlamatUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error)
-	CreateAlamatUser(requestUser request.GetByUserIDRequest, requestData request.CreateAddressRequest) (response.AddressResponse, error)
-	UpdateAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest, requestData request.UpdateAddressRequest) (response.AddressResponse, error)
-	DeleteAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest) error
+	GetMyAddress(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error)
+	GetAddressUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error)
+	CreateAddressUser(requestUser request.GetByUserIDRequest, requestData request.CreateAddressRequest) (response.AddressResponse, error)
+	UpdateAddressUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest, requestData request.UpdateAddressRequest) (response.AddressResponse, error)
+	DeleteAddressUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest) error
 
 }
-func NewUserService(repository repositories.UserRepository, alamatRepository repositories.AlamatRepository) *userService {
-	return &userService{repository, alamatRepository}
+func NewUserService(repository repositories.UserRepository, addressRepository repositories.AddressRepository) *userService {
+	return &userService{repository, addressRepository}
 }
 
 func (s *userService) GetUserByID(request request.GetByUserIDRequest) (response.UserResponse, error) {
@@ -98,8 +98,8 @@ func (s *userService) UpdateUser(requestID request.GetByUserIDRequest, requestDa
 	return userResponse, nil
 }
 
-func (s *userService) GetMyAlamat(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error) {
-	getMyAddress, err := s.alamatRepository.GetAlamatByUserID(requestUser.ID)
+func (s *userService) GetMyAddress(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error) {
+	getMyAddress, err := s.addressRepository.GetAddressByUserID(requestUser.ID)
 	if err != nil {
 		return []response.AddressResponse{}, err
 	}
@@ -113,8 +113,8 @@ func (s *userService) GetMyAlamat(requestUser request.GetByUserIDRequest) ([]res
 	return addressesResponse, nil
 }
 
-func (s *userService) GetAlamatUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error) {
-	address, err := s.alamatRepository.GetAlamatUserByID(requestUser.ID, requestID.ID)
+func (s *userService) GetAddressUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error) {
+	address, err := s.addressRepository.GetAddressUserByID(requestUser.ID, requestID.ID)
 	if err != nil {
 		return response.AddressResponse{}, err
 	}
@@ -124,8 +124,8 @@ func (s *userService) GetAlamatUserByID(requestUser request.GetByUserIDRequest, 
 	return addressResponse, nil
 }
 
-func (s *userService) CreateAlamatUser(requestUser request.GetByUserIDRequest, requestData request.CreateAddressRequest) (response.AddressResponse, error) {
-	address := model.Alamat{
+func (s *userService) CreateAddressUser(requestUser request.GetByUserIDRequest, requestData request.CreateAddressRequest) (response.AddressResponse, error) {
+	address := model.Address{
 		IDUser: requestUser.ID,
 		JudulAlamat: requestData.JudulAlamat,
 		NamaPenerima: requestData.NamaPenerima,
@@ -134,7 +134,7 @@ func (s *userService) CreateAlamatUser(requestUser request.GetByUserIDRequest, r
 		CreatedAt: time.Now(),
 	}
 
-	createAddress, err := s.alamatRepository.CreateAlamat(address)
+	createAddress, err := s.addressRepository.CreateAddress(address)
 	if err != nil {
 		return response.AddressResponse{}, err
 	}
@@ -144,8 +144,8 @@ func (s *userService) CreateAlamatUser(requestUser request.GetByUserIDRequest, r
 	return addressResponse, nil
 }
 
-func (s *userService) UpdateAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest, requestData request.UpdateAddressRequest) (response.AddressResponse, error) {
-	getAddress, err := s.alamatRepository.GetAlamatByID(requestID.ID)
+func (s *userService) UpdateAddressUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest, requestData request.UpdateAddressRequest) (response.AddressResponse, error) {
+	getAddress, err := s.addressRepository.GetAddressByID(requestID.ID)
 	if err != nil {
 		return response.AddressResponse{}, err
 	}
@@ -154,7 +154,7 @@ func (s *userService) UpdateAlamatUser(requestUser request.GetByUserIDRequest,  
 		return response.AddressResponse{}, constants.ErrUnauthorized
 	}
 
-	address := model.Alamat{
+	address := model.Address{
 		ID : requestID.ID,
 		IDUser : getAddress.IDUser,
 		JudulAlamat : getAddress.JudulAlamat,
@@ -165,7 +165,7 @@ func (s *userService) UpdateAlamatUser(requestUser request.GetByUserIDRequest,  
 		UpdatedAt : time.Now(),
 	}
 
-	updateAddress, err := s.alamatRepository.UpdateAlamat(address)
+	updateAddress, err := s.addressRepository.UpdateAddress(address)
 	if err != nil {
 		return response.AddressResponse{}, err
 	}
@@ -175,8 +175,8 @@ func (s *userService) UpdateAlamatUser(requestUser request.GetByUserIDRequest,  
 	return addressResponse, nil
 }
 
-func (s *userService) DeleteAlamatUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest) error {
-	getAddress, err := s.alamatRepository.GetAlamatByID(requestID.ID)
+func (s *userService) DeleteAddressUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest) error {
+	getAddress, err := s.addressRepository.GetAddressByID(requestID.ID)
 	if err != nil {
 		return err
 	}
@@ -185,7 +185,7 @@ func (s *userService) DeleteAlamatUser(requestUser request.GetByUserIDRequest,  
 		return constants.ErrUnauthorized
 	}
 
-	err = s.alamatRepository.DeleteAlamat(getAddress.ID)
+	err = s.addressRepository.DeleteAddress(getAddress.ID)
 	if err != nil {
 		return err
 	}

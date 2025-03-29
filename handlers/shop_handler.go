@@ -14,15 +14,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type tokoHandler struct {
-	tokoService services.TokoService
+type shopHandler struct {
+	shopService services.ShopService
 }
 
-func NewTokoHandler(tokoService services.TokoService) *tokoHandler {
-	return &tokoHandler{tokoService}
+func NewShopHandler(shopService services.ShopService) *shopHandler {
+	return &shopHandler{shopService}
 }
 
-func (h *tokoHandler) MyToko(c *fiber.Ctx) error {
+func (h *shopHandler) MyShop(c *fiber.Ctx) error {
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
 	if !ok {
@@ -38,7 +38,7 @@ func (h *tokoHandler) MyToko(c *fiber.Ctx) error {
 		ID: user.ID,
 	}
 
-	myTokoResponse, err := h.tokoService.GetMyToko(requestUser)
+	myShopResponse, err := h.shopService.GetMyShop(requestUser)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
@@ -52,12 +52,12 @@ func (h *tokoHandler) MyToko(c *fiber.Ctx) error {
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
-		Data: myTokoResponse,
+		Data: myShopResponse,
 	})
 }
 
-func (h *tokoHandler) GetListToko(c *fiber.Ctx) error {
-	var request request.TokoListRequest
+func (h *shopHandler) GetListShop(c *fiber.Ctx) error {
+	var request request.ShopListRequest
 
 	err := c.QueryParser(&request)
 	if err != nil {
@@ -77,7 +77,7 @@ func (h *tokoHandler) GetListToko(c *fiber.Ctx) error {
 		request.Limit = 1
 	}
 
-	tokoResponse, err := h.tokoService.GetListToko(request)
+	shopResponse, err := h.shopService.GetListShop(request)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.Response{
 			Status: false,
@@ -91,12 +91,12 @@ func (h *tokoHandler) GetListToko(c *fiber.Ctx) error {
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
-		Data: tokoResponse,
+		Data: shopResponse,
 	})
 }
 
-func (h *tokoHandler) GetDetailToko(c *fiber.Ctx) error {
-	var requestID request.GetTokoByID
+func (h *shopHandler) GetDetailShop(c *fiber.Ctx) error {
+	var requestID request.GetShopByID
 
 	err := c.ParamsParser(&requestID)
 	if err != nil {
@@ -108,7 +108,7 @@ func (h *tokoHandler) GetDetailToko(c *fiber.Ctx) error {
 		})
 	}
 
-	myTokoResponse, err := h.tokoService.GetTokoByID(requestID)
+	myShopResponse, err := h.shopService.GetShopByID(requestID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
@@ -122,13 +122,13 @@ func (h *tokoHandler) GetDetailToko(c *fiber.Ctx) error {
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
-		Data: myTokoResponse,
+		Data: myShopResponse,
 	})
 }
 
-func ( h *tokoHandler) UpdateProfileToko(c *fiber.Ctx) error {
+func ( h *shopHandler) UpdateProfileShop(c *fiber.Ctx) error {
 	var requestUser request.GetByUserIDRequest
-	var requestID request.GetTokoByID
+	var requestID request.GetShopByID
 	var requestData request.UpdateProfileShopRequest
 
 	authUser := c.Locals("authUser")
@@ -200,7 +200,7 @@ func ( h *tokoHandler) UpdateProfileToko(c *fiber.Ctx) error {
 
 	requestData.Photo = photoPath
 
-	productResponse, err := h.tokoService.UpdateToko(requestUser, requestID, requestData)
+	productResponse, err := h.shopService.UpdateShop(requestUser, requestID, requestData)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
