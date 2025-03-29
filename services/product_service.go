@@ -14,7 +14,8 @@ import (
 )
 
 type ProductService interface {
-	GetProductByID(requestID request.GetByProductIDRequest) (response.ProductResponse, error)
+	GetListProduct(requestUser request.GetByUserIDRequest, requestSearch request.ProductListRequest) ([]response.ProductResponse, error)
+	GetProductByID(requestUser request.GetByUserIDRequest, requestID request.GetByProductIDRequest) (response.ProductResponse, error)
 	CreateProduct(requestUser request.GetByUserIDRequest, requestData request.ProductRequest) (response.ProductResponse, error)
 	UpdateProduct(requestUser request.GetByUserIDRequest,  requestID request.GetByProductIDRequest, requestData request.ProductRequest) (response.ProductResponse, error)
 	DeleteProduct(requestUser request.GetByUserIDRequest,  requestID request.GetByProductIDRequest) error
@@ -34,53 +35,102 @@ func NewProductService(
 	return &productService{repository, tokoRepository, categoryRepository}
 }
 
-func (s *productService) GetProductByID(requestID request.GetByProductIDRequest) (response.ProductResponse, error) {
-	getProduct, err := s.repository.GetProductByID(requestID.ID)
+func (s *productService) GetListProduct(requestID request.GetByUserIDRequest, requestSearch request.ProductListRequest) ([]response.ProductResponse, error) {
+	listProducts, err := s.repository.GetProductsByUserID(requestID.ID, requestSearch)
 	if err != nil {
-		return response.ProductResponse{}, err
+		return []response.ProductResponse{}, err
 	}
 
-	tokoResponse := response.TokoResponse{
-		ID : getProduct.Toko.ID,
-		NamaToko : getProduct.Toko.NamaToko,
-		URLFoto : getProduct.Toko.URLFoto,
+	if len(listProducts) == 0 {
+		return []response.ProductResponse{}, nil
 	}
-
-	categoryResponse := response.CategoryResponse{
-		ID : getProduct.Category.ID,
-		NamaCategory : getProduct.Category.NamaCategory,
-	}
-
-	productResponse := response.ProductResponse{
-		ID : getProduct.ID,
-		NamaProduk : getProduct.NamaProduk,
-		Slug : getProduct.Slug,
-		HargaReseller : getProduct.HargaReseller,
-		HargaKonsumen : getProduct.HargaKonsumen,
-		Stok : getProduct.Stok,
-		Deskripsi : getProduct.Deskripsi,
-		Toko : tokoResponse,
-		Category : categoryResponse,
-	}
-
-	getPhotos, err := s.repository.GetPhotosProductByProductID(requestID.ID)
-	if err != nil {
-		return response.ProductResponse{}, err
-	}
-
-	var photos []response.PhotoProductResponse
-	for _, getPhoto := range getPhotos {
-		photo := response.PhotoProductResponse{
-			ID : getPhoto.ID,
-			IDProduk : getPhoto.IDProduk,
-			URL : getPhoto.URL,
+	
+	var responseListProduct []response.ProductResponse
+	for _, product := range listProducts {
+		productShop := response.TokoResponse{
+			ID: product.Toko.ID,
+			NamaToko: product.Toko.NamaToko,
+			URLFoto: product.Toko.URLFoto,
 		}
-		photos = append(photos, photo)
+
+		productCategory := response.CategoryResponse{
+			ID: product.Category.ID,
+			NamaCategory: product.Category.NamaCategory,
+		}
+
+		var productPhotos []response.PhotoProductResponse
+		for _, photo := range product.PhotosProduct {
+			photoProduct := response.PhotoProductResponse{
+				ID: photo.ID,
+				IDProduk: photo.IDProduk,
+				URL: photo.URL,
+			}
+
+			productPhotos = append(productPhotos, photoProduct)
+		}
+
+		responseProduct := response.ProductResponse{
+			ID: product.ID,
+			NamaProduk: product.NamaProduk,
+			Slug: product.Slug,
+			HargaReseller: product.HargaReseller,
+			HargaKonsumen: product.HargaKonsumen,
+			Stok: product.Stok,
+			Deskripsi: product.Deskripsi,
+			Toko: productShop,
+			Category: productCategory,
+			Photos: productPhotos,
+		}
+	
+		responseListProduct = append(responseListProduct, responseProduct)
 	}
 
-	productResponse.Photos = photos
 
-	return productResponse, nil
+	return responseListProduct, nil
+}
+
+func (s *productService) GetProductByID(requestUser request.GetByUserIDRequest, requestID request.GetByProductIDRequest) (response.ProductResponse, error) {
+	product, err := s.repository.GetProductByID(requestUser.ID, requestID.ID)
+	if err != nil {
+		return response.ProductResponse{}, err
+	}
+
+	productShop := response.TokoResponse{
+		ID: product.Toko.ID,
+		NamaToko: product.Toko.NamaToko,
+		URLFoto: product.Toko.URLFoto,
+	}
+
+	productCategory := response.CategoryResponse{
+		ID: product.Category.ID,
+		NamaCategory: product.Category.NamaCategory,
+	}
+
+	var productPhotos []response.PhotoProductResponse
+	for _, photo := range product.PhotosProduct {
+		photoProduct := response.PhotoProductResponse{
+			ID: photo.ID,
+			IDProduk: photo.IDProduk,
+			URL: photo.URL,
+		}
+
+		productPhotos = append(productPhotos, photoProduct)
+	}
+
+	responseProduct := response.ProductResponse{
+		ID: product.ID,
+		NamaProduk: product.NamaProduk,
+		Slug: product.Slug,
+		HargaReseller: product.HargaReseller,
+		HargaKonsumen: product.HargaKonsumen,
+		Stok: product.Stok,
+		Deskripsi: product.Deskripsi,
+		Toko: productShop,
+		Category: productCategory,
+		Photos: productPhotos,
+	}
+
+	return responseProduct, nil
 }
 
 func (s *productService) CreateProduct(requestUser request.GetByUserIDRequest, requestData request.ProductRequest) (response.ProductResponse, error) {
@@ -181,7 +231,7 @@ func (s *productService) UpdateProduct(
 	requestID request.GetByProductIDRequest,
 	requestData request.ProductRequest,
 ) (response.ProductResponse, error) {
-	product, err := s.repository.GetProductByID(requestID.ID)
+	product, err := s.repository.GetProductByID(requestUser.ID, requestID.ID)
 	if err != nil {
 		return response.ProductResponse{}, err
 	}
@@ -279,7 +329,7 @@ func (s *productService) UpdateProduct(
 		if err != nil {
 			tx.Rollback()
 			return response.ProductResponse{}, err
-		}	
+		}
 	}
 	
 	tx.Commit()
@@ -345,7 +395,7 @@ func (s *productService) DeleteProduct(
 		}
 	}()
 
-	getProduct, err := s.repository.GetProductByID(requestID.ID)
+	getProduct, err := s.repository.GetProductByID(requestUser.ID, requestID.ID)
 	if err != nil {
 		return err
 	}
