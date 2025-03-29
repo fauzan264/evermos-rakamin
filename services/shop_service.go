@@ -35,14 +35,10 @@ func (s *shopService) GetMyShop(requestUser request.GetByUserIDRequest) (respons
 	return shopResponse, nil
 }
 
-func (s *shopService) GetListShop(request request.ShopListRequest) (response.PaginatedResponse, error) {
-	page := request.Page
-	limit := request.Limit
-	name := request.Name
-
-	listShop, err := s.repository.GetListShop(page, limit, name)
-
+func (s *shopService) GetListShop(requestSearch request.ShopListRequest) (response.PaginatedResponse, error) {
 	var shopResponse response.PaginatedResponse
+	
+	listShop, err := s.repository.GetListShop(requestSearch)
 
 	if err != nil {
 		return shopResponse, err
@@ -55,8 +51,8 @@ func (s *shopService) GetListShop(request request.ShopListRequest) (response.Pag
 	}
 
 	shopResponse.Data = listShopFormatter
-	shopResponse.Page = request.Page
-	shopResponse.Limit = request.Limit
+	shopResponse.Page = requestSearch.Page
+	shopResponse.Limit = requestSearch.Limit
 
 	return shopResponse, nil
 }

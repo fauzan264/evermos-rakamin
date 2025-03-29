@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/model"
 	"gorm.io/gorm"
 )
@@ -11,7 +12,7 @@ type shopRepository struct {
 
 type ShopRepository interface {
 	CreateShop(shop model.Shop) error
-	GetListShop(page, limit int, name string) ([]model.Shop, error)
+	GetListShop(requestSearch request.ShopListRequest) ([]model.Shop, error)
 	GetShopByID(id int) (model.Shop, error)
 	GetShopByUserID(userID int) (model.Shop, error)
 	UpdateShop(shop model.Shop) (model.Shop, error)
@@ -30,20 +31,20 @@ func (r *shopRepository) CreateShop(shop model.Shop) error {
 	return nil
 }
 
-func (r *shopRepository) GetListShop(page, limit int, name string) ([]model.Shop, error) {
+func (r *shopRepository) GetListShop(requestSearch request.ShopListRequest) ([]model.Shop, error) {
 	var listShop []model.Shop
 
-	offset := (page - 1) * limit
+	offset := (requestSearch.Page - 1) * requestSearch.Limit
 
 	query := r.db.Model(&model.Shop{})
 
-	if name != "" {
-		query = query.Where("nama_toko LIKE ?", "%"+name+"%")
+	if requestSearch.Name != "" {
+		query = query.Where("nama_toko LIKE ?", "%"+requestSearch.Name+"%")
 	}
 
-	err := query.Limit(limit).
-		Offset(offset).
-		Find(&listShop).Error
+	err := query.Limit(requestSearch.Limit).
+				Offset(offset).
+				Find(&listShop).Error
 
 	if err != nil {
 		return nil, err
