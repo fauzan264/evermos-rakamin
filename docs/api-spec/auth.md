@@ -55,7 +55,7 @@
 ```json
 {
     "status": true,
-    "message": "Succeed to GET data",
+    "message": "Succeed to POST data",
     "errors": null,
     "data": {
         "nama": "John Doe",
