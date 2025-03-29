@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -14,10 +15,12 @@ import (
 )
 
 func main() {
+	cfg := config.LoadConfig()
 	db := config.InitDatabase()
 
 	router := fiber.New()
 	router.Use(cors.New())
+	router.Static("/uploads", "./uploads")
 
 	// API external for data province & city
 	provinceCityApiURL := os.Getenv("API_LOCATION")
@@ -97,7 +100,7 @@ func main() {
 	api.Get("/trx/:id", authMiddleware, trxHandler.GetDetailTRX)
 	api.Post("/trx", authMiddleware, trxHandler.CreateTRX)
 
-	if err := router.Listen(":8000"); err != nil {
+	if err := router.Listen(fmt.Sprintf("%s:%s", cfg.AppHost, cfg.AppPort)); err != nil {
 		log.Println("Error: ", err)
 	}
 }
