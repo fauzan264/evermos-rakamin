@@ -19,29 +19,14 @@ type DetailTrx struct {
 }
 
 func TRXResponseFormatter(trx model.TRX) TRXResponse {
-	trxAlamat := AddressResponse{
-		ID: trx.Alamat.ID,
-		JudulAlamat: trx.Alamat.JudulAlamat,
-		NamaPenerima: trx.Alamat.NamaPenerima,
-		NoTelp: trx.Alamat.NoTelp,
-		DetailAlamat: trx.Alamat.DetailAlamat,
-	}
+	trxAlamat := AddressResponseFormatter(trx.Alamat)
 
 	var listDetailTRX []DetailTrx
 	for _, detailTRX := range trx.DetailTRX {
 
-		productShop := TokoResponse{
-			ID: detailTRX.LogProduct.Toko.ID,
-			NamaToko: detailTRX.LogProduct.Toko.NamaToko,
-			URLFoto: detailTRX.LogProduct.Toko.URLFoto,
-		}
+		productShop := ShopResponseFormatter(detailTRX.LogProduct.Toko)
 
-		productCategory := CategoryResponse{
-			ID: detailTRX.LogProduct.Category.ID,
-			NamaCategory: detailTRX.LogProduct.Category.NamaCategory,
-			CreatedAt: &detailTRX.LogProduct.Category.CreatedAt,
-			UpdatedAt: &detailTRX.LogProduct.Category.UpdatedAt,
-		}
+		productCategory := CategoryResponseFormatter(detailTRX.LogProduct.Category)
 
 		var productPhotos []PhotoProductResponse
 		for _, photo := range detailTRX.LogProduct.Produk.PhotosProduct {
@@ -66,11 +51,7 @@ func TRXResponseFormatter(trx model.TRX) TRXResponse {
 			Photos: productPhotos,
 		}
 
-		shop := TokoResponse{
-			ID: detailTRX.Toko.ID,
-			NamaToko: detailTRX.Toko.NamaToko,
-			URLFoto: detailTRX.Toko.URLFoto,
-		}
+		shop := ShopResponseFormatter(detailTRX.Toko)
 
 		dataDetailTRX := DetailTrx{
 			Product: product,
