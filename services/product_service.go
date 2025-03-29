@@ -36,57 +36,18 @@ func NewProductService(
 }
 
 func (s *productService) GetListProduct(requestID request.GetByUserIDRequest, requestSearch request.ProductListRequest) ([]response.ProductResponse, error) {
-	listProducts, err := s.repository.GetProductsByUserID(requestID.ID, requestSearch)
+	listProduct, err := s.repository.GetListProduct(requestSearch)
 	if err != nil {
 		return []response.ProductResponse{}, err
 	}
 
-	if len(listProducts) == 0 {
+	if len(listProduct) == 0 {
 		return []response.ProductResponse{}, nil
 	}
 	
-	var responseListProduct []response.ProductResponse
-	for _, product := range listProducts {
-		productShop := response.ShopResponse{
-			ID: product.Toko.ID,
-			NamaToko: product.Toko.NamaToko,
-			URLFoto: product.Toko.URLFoto,
-		}
+	listProductResponse := response.ListProductResponseFormatter(listProduct)
 
-		productCategory := response.CategoryResponse{
-			ID: product.Category.ID,
-			NamaCategory: product.Category.NamaCategory,
-		}
-
-		var productPhotos []response.PhotoProductResponse
-		for _, photo := range product.PhotosProduct {
-			photoProduct := response.PhotoProductResponse{
-				ID: photo.ID,
-				IDProduk: photo.IDProduk,
-				URL: photo.URL,
-			}
-
-			productPhotos = append(productPhotos, photoProduct)
-		}
-
-		responseProduct := response.ProductResponse{
-			ID: product.ID,
-			NamaProduk: product.NamaProduk,
-			Slug: product.Slug,
-			HargaReseller: product.HargaReseller,
-			HargaKonsumen: product.HargaKonsumen,
-			Stok: product.Stok,
-			Deskripsi: product.Deskripsi,
-			Toko: productShop,
-			Category: productCategory,
-			Photos: productPhotos,
-		}
-	
-		responseListProduct = append(responseListProduct, responseProduct)
-	}
-
-
-	return responseListProduct, nil
+	return listProductResponse, nil
 }
 
 func (s *productService) GetProductByID(requestUser request.GetByUserIDRequest, requestID request.GetByProductIDRequest) (response.ProductResponse, error) {
@@ -95,42 +56,9 @@ func (s *productService) GetProductByID(requestUser request.GetByUserIDRequest, 
 		return response.ProductResponse{}, err
 	}
 
-	productShop := response.ShopResponse{
-		ID: product.Toko.ID,
-		NamaToko: product.Toko.NamaToko,
-		URLFoto: product.Toko.URLFoto,
-	}
+	productResponse := response.ProductResponseFormatter(product)
 
-	productCategory := response.CategoryResponse{
-		ID: product.Category.ID,
-		NamaCategory: product.Category.NamaCategory,
-	}
-
-	var productPhotos []response.PhotoProductResponse
-	for _, photo := range product.PhotosProduct {
-		photoProduct := response.PhotoProductResponse{
-			ID: photo.ID,
-			IDProduk: photo.IDProduk,
-			URL: photo.URL,
-		}
-
-		productPhotos = append(productPhotos, photoProduct)
-	}
-
-	responseProduct := response.ProductResponse{
-		ID: product.ID,
-		NamaProduk: product.NamaProduk,
-		Slug: product.Slug,
-		HargaReseller: product.HargaReseller,
-		HargaKonsumen: product.HargaKonsumen,
-		Stok: product.Stok,
-		Deskripsi: product.Deskripsi,
-		Toko: productShop,
-		Category: productCategory,
-		Photos: productPhotos,
-	}
-
-	return responseProduct, nil
+	return productResponse, nil
 }
 
 func (s *productService) CreateProduct(requestUser request.GetByUserIDRequest, requestData request.ProductRequest) (response.ProductResponse, error) {
@@ -197,7 +125,7 @@ func (s *productService) CreateProduct(requestUser request.GetByUserIDRequest, r
 		})
 	}
 
-	tokoResponse := response.ShopResponse{
+	shopResponse := response.ShopResponse{
 		ID:       shop.ID,
 		NamaToko: shop.NamaToko,
 		URLFoto:  shop.URLFoto,
@@ -218,7 +146,7 @@ func (s *productService) CreateProduct(requestUser request.GetByUserIDRequest, r
 		HargaKonsumen: createProduct.HargaKonsumen,
 		Stok:          createProduct.Stok,
 		Deskripsi:     createProduct.Deskripsi,
-		Toko:          tokoResponse,
+		Toko:          shopResponse,
 		Category:      categoryResponse,
 		Photos:        photosResponse,
 	}
