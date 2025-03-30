@@ -11,6 +11,7 @@ import (
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
 	"github.com/fauzan264/evermos-rakamin/helpers"
 	"github.com/fauzan264/evermos-rakamin/services"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 
 	"github.com/gofiber/fiber/v2"
@@ -32,7 +33,7 @@ func (h *productHandler) GetListProduct(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -42,7 +43,7 @@ func (h *productHandler) GetListProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -94,7 +95,7 @@ func (h *productHandler) GetDetailProduct(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -104,7 +105,7 @@ func (h *productHandler) GetDetailProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -148,7 +149,7 @@ func (h *productHandler) CreateProduct(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -158,7 +159,7 @@ func (h *productHandler) CreateProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -235,6 +236,17 @@ func (h *productHandler) CreateProduct(c *fiber.Ctx) error {
 	}
 
 	requestData.Photos = photos
+
+	validate := validator.New()
+	err = validate.Struct(requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedInsertData,
+			Errors: helpers.FormatValidationError(err),
+			Data: nil,
+		})
+	}
 
 	productResponse, err := h.productService.CreateProduct(requestUser, requestData)
 	if err != nil {
@@ -392,7 +404,7 @@ func (h *productHandler) DeleteProduct(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})

@@ -33,7 +33,7 @@
 ```json
 {
     "status": false,
-    "message": "Failed to GET data",
+    "message": "Please provide a valid authentication token",
     "errors": [
         "Unauthorized"
     ],
@@ -101,7 +101,7 @@
 ```json
 {
     "status": false,
-    "message": "Failed to UPDATE data",
+    "message": "Please provide a valid authentication token",
     "errors": [
         "Unauthorized"
     ],
@@ -122,7 +122,7 @@
 ```json
 {
     "status": false,
-    "message": "Failed to GET data",
+    "message": "Please provide a valid authentication token",
     "errors": [
         "Unauthorized"
     ],
@@ -171,7 +171,7 @@
 ```json
 {
     "status": false,
-    "message": "Failed to GET data",
+    "message": "Please provide a valid authentication token",
     "errors": [
         "Unauthorized"
     ],
@@ -231,7 +231,7 @@
 ```json
 {
     "status": false,
-    "message": "Failed to POST data",
+    "message": "Please provide a valid authentication token",
     "errors": [
         "Unauthorized"
     ],
@@ -288,7 +288,7 @@
 ```json
 {
     "status": false,
-    "message": "Failed to UPDATE data",
+    "message": "Please provide a valid authentication token",
     "errors": [
         "Unauthorized"
     ],
@@ -331,7 +331,7 @@
 ```json
 {
     "status": false,
-    "message": "Failed to DELETE data",
+    "message": "Please provide a valid authentication token",
     "errors": [
         "Unauthorized"
     ],

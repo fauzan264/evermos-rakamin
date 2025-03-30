@@ -48,7 +48,7 @@ func AuthMiddleware(userService services.UserService) fiber.Handler {
 func sendUnauthorizedResponse(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 		Status: false,
-		Message: constants.FailedGetData,
+		Message: constants.Unauthorized,
 		Errors: []string{constants.ErrUnauthorized.Error()},
 		Data: nil,
 	})

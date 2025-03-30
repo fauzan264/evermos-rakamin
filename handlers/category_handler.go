@@ -50,7 +50,7 @@ func (h *categoryHandler) GetDetailCategory(c *fiber.Ctx) error {
 		})
 	}
 
-	getCategory, err := h.categoryService.GetDetailCategory(request)
+	categoryResponse, err := h.categoryService.GetDetailCategory(request)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(response.Response{
 			Status: false,
@@ -64,7 +64,7 @@ func (h *categoryHandler) GetDetailCategory(c *fiber.Ctx) error {
 		Status: true,
 		Message: constants.SuccessGetData,
 		Errors: nil,
-		Data: getCategory,
+		Data: categoryResponse,
 	})
 }
 
@@ -75,7 +75,7 @@ func (h *categoryHandler) CreateCategory(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -85,7 +85,7 @@ func (h *categoryHandler) CreateCategory(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -94,7 +94,7 @@ func (h *categoryHandler) CreateCategory(c *fiber.Ctx) error {
 	if !user.IsAdmin {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.FailedInsertData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -147,7 +147,7 @@ func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -157,7 +157,7 @@ func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -166,7 +166,7 @@ func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
 	if !user.IsAdmin {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.FailedUpdateData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -228,7 +228,7 @@ func (h *categoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -238,7 +238,7 @@ func (h *categoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -247,7 +247,7 @@ func (h *categoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	if !user.IsAdmin {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.FailedDeleteData,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})

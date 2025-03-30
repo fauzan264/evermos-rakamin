@@ -26,7 +26,7 @@ func (h *trxHandler) GetListTRX(c *fiber.Ctx) error {
 	if authUser == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -36,7 +36,7 @@ func (h *trxHandler) GetListTRX(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -89,7 +89,7 @@ func (h *trxHandler) GetDetailTRX(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -134,7 +134,7 @@ func (h *trxHandler) CreateTRX(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})

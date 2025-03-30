@@ -24,7 +24,7 @@ func (h *userHandler) GetMyProfile(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -47,7 +47,7 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -102,7 +102,7 @@ func (h *userHandler) GetMyAddress(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -137,7 +137,7 @@ func (h *userHandler) GetDetailAddress(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -182,7 +182,7 @@ func (h *userHandler) CreateAddressUser(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -239,7 +239,7 @@ func (h *userHandler) UpdateAddressUser(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -305,7 +305,7 @@ func (h *userHandler) DeleteAddressUser(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.Unauthorized,
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
