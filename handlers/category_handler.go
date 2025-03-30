@@ -92,9 +92,9 @@ func (h *categoryHandler) CreateCategory(c *fiber.Ctx) error {
 	}
 
 	if !user.IsAdmin {
-		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+		return c.Status(fiber.StatusForbidden).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedInsertData,
+			Message: constants.ErrForbidden.Error(),
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -164,9 +164,9 @@ func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
 	}
 
 	if !user.IsAdmin {
-		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+		return c.Status(fiber.StatusForbidden).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedUpdateData,
+			Message: constants.ErrForbidden.Error(),
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
@@ -245,9 +245,9 @@ func (h *categoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	}
 
 	if !user.IsAdmin {
-		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
+		return c.Status(fiber.StatusForbidden).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedDeleteData,
+			Message: constants.ErrForbidden.Error(),
 			Errors: []string{constants.ErrUnauthorized.Error()},
 			Data: nil,
 		})
