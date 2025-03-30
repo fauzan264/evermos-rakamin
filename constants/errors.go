@@ -10,6 +10,7 @@ var (
 	ErrTrxNotFound = errors.New("No Data Trx")
 	ErrInvalidToken = errors.New("Invalid token")
 	ErrUnauthorized = errors.New("Unauthorized")
+	ErrForbidden = errors.New("Forbidden")
 	ErrInvalidDateFormat = errors.New("Invalid date format. Use DD/MM/YYYY")
 	ErrInsufficient = errors.New("insufficient stock")
 )
