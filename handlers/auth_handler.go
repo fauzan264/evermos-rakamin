@@ -68,7 +68,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.FailedInsertData,
 			Errors: helpers.FormatValidationError(err),
 			Data: nil,
 		})
@@ -79,7 +79,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.FailedInsertData,
 			Errors: helpers.FormatValidationError(err),
 			Data: nil,
 		})
@@ -89,7 +89,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(response.Response{
 			Status: false,
-			Message: constants.FailedGetData,
+			Message: constants.FailedInsertData,
 			Errors: []string{err.Error()},
 			Data: nil,
 		})
@@ -97,7 +97,7 @@ func (h *authHandler) LoginUser(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(response.Response{
 		Status: true,
-		Message: constants.SuccessGetData,
+		Message: constants.SuccessInsertData,
 		Errors: nil,
 		Data: loginUser,
 	})
