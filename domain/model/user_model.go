@@ -11,7 +11,7 @@ type User struct {
 	JenisKelamin 	string		`gorm:"type:varchar(255);not null"`
 	Tentang 		string		`gorm:"type:text;not null"`
 	Pekerjaan 		string		`gorm:"type:varchar(255);not null"`
-	Email 			string		`gorm:"type:varchar(255);not null"`
+	Email 			string		`gorm:"type:varchar(255);not null;uniqueIndex:idx_email"`
 	IDProvinsi 		string		`gorm:"type:varchar(255);not null"`
 	IDKota 			string		`gorm:"type:varchar(255);not null"`
 	IsAdmin 		bool		`gorm:"column:isAdmin;default:false"`
