@@ -52,7 +52,8 @@ func (r *trxRepository) GetTRXByUserID(userID int, requestSearch request.TRXList
 
 func (r *trxRepository) GetTRXUserByID(userID, id int) (model.TRX, error) {
 	var trx model.TRX
-	err := r.db.Preload("Alamat").
+	err := r.db.Where("id_user = ? and id = ?", userID, id).
+				Preload("Alamat").
 				Preload("DetailTRX.LogProduct.Toko").
 				Preload("DetailTRX.LogProduct.Category").
 				Preload("DetailTRX.LogProduct.Produk.PhotosProduct").
