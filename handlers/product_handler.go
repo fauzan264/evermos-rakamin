@@ -289,7 +289,7 @@ func (h *productHandler) UpdateProduct(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedUpdateData,
-			Errors: helpers.FormatValidationError(err),
+			Errors: []string{err.Error()},
 			Data: nil,
 		})
 	}
@@ -417,7 +417,7 @@ func (h *productHandler) DeleteProduct(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedDeleteData,
-			Errors: helpers.FormatValidationError(err),
+			Errors: []string{err.Error()},
 			Data: nil,
 		})
 	}

@@ -252,7 +252,7 @@ func (h *userHandler) UpdateAddressUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedUpdateData,
-			Errors: helpers.FormatValidationError(err),
+			Errors: []string{err.Error()},
 		})
 	}
 
@@ -318,7 +318,7 @@ func (h *userHandler) DeleteAddressUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedDeleteData,
-			Errors: helpers.FormatValidationError(err),
+			Errors: []string{err.Error()},
 			Data: nil,
 		})
 	}

@@ -4,7 +4,6 @@ import (
 	"github.com/fauzan264/evermos-rakamin/constants"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/request"
 	"github.com/fauzan264/evermos-rakamin/domain/dto/response"
-	"github.com/fauzan264/evermos-rakamin/helpers"
 	"github.com/fauzan264/evermos-rakamin/services"
 	"github.com/gofiber/fiber/v2"
 )
@@ -44,7 +43,7 @@ func (h *provinceCityHandler) GetDetailProvince(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedGetData,
-			Errors: helpers.FormatValidationError(err),
+			Errors: []string{err.Error()},
 			Data: nil,
 		})
 	}
@@ -75,7 +74,7 @@ func (h *provinceCityHandler) GetListCity(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedGetData,
-			Errors: helpers.FormatValidationError(err),
+			Errors: []string{err.Error()},
 			Data: nil,
 		})
 	}
@@ -106,7 +105,7 @@ func (h *provinceCityHandler) GetDetailCity(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.Response{
 			Status: false,
 			Message: constants.FailedGetData,
-			Errors: helpers.FormatValidationError(err),
+			Errors: []string{err.Error()},
 			Data: nil,
 		})
 	}
