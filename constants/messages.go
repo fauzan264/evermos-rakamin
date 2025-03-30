@@ -21,3 +21,5 @@ const (
 const (
 	SuccessDeleteCategory = "Success delete category"
 )
+
+const Unauthorized = "Please provide a valid authentication token"
