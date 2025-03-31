@@ -19,7 +19,7 @@ type userService struct {
 type UserService interface {
 	GetUserByID(request request.GetByUserIDRequest) (response.UserResponse, error)
 	UpdateUser(requestID request.GetByUserIDRequest, requestData request.UpdateProfileRequest) (response.UserResponse, error)
-	GetMyAddress(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error)
+	GetMyAddress(requestUser request.GetByUserIDRequest, requestSearch request.AddressListRequest) (response.PaginatedResponse, error)
 	GetAddressUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error)
 	CreateAddressUser(requestUser request.GetByUserIDRequest, requestData request.CreateAddressRequest) (response.AddressResponse, error)
 	UpdateAddressUser(requestUser request.GetByUserIDRequest,  requestID request.GetByAddressIDRequest, requestData request.UpdateAddressRequest) (response.AddressResponse, error)
@@ -98,19 +98,25 @@ func (s *userService) UpdateUser(requestID request.GetByUserIDRequest, requestDa
 	return userResponse, nil
 }
 
-func (s *userService) GetMyAddress(requestUser request.GetByUserIDRequest) ([]response.AddressResponse, error) {
-	getMyAddress, err := s.addressRepository.GetAddressByUserID(requestUser.ID)
+func (s *userService) GetMyAddress(requestUser request.GetByUserIDRequest, requestSearch request.AddressListRequest) (response.PaginatedResponse, error) {
+	var myAddressResponse response.PaginatedResponse
+
+	listMyAddress, err := s.addressRepository.GetAddressByUserID(requestUser.ID, requestSearch)
 	if err != nil {
-		return []response.AddressResponse{}, err
+		return response.PaginatedResponse{}, err
 	}
 
-	addressesResponse := response.ListAddressResponseFormatter(getMyAddress)
+	listMyAddressResponse := response.ListAddressResponseFormatter(listMyAddress)
 
-	if len(addressesResponse) == 0 {
-		addressesResponse = []response.AddressResponse{}
+	if len(listMyAddressResponse) == 0 {
+		listMyAddressResponse = []response.AddressResponse{}
 	}
 
-	return addressesResponse, nil
+	myAddressResponse.Data = listMyAddressResponse
+	myAddressResponse.Page = requestSearch.Page
+	myAddressResponse.Limit = requestSearch.Limit
+
+	return myAddressResponse, nil
 }
 
 func (s *userService) GetAddressUserByID(requestUser request.GetByUserIDRequest, requestID request.GetByAddressIDRequest) (response.AddressResponse, error) {
