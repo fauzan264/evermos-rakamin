@@ -96,6 +96,7 @@ func (h *userHandler) UpdateProfile(c *fiber.Ctx) error {
 
 func (h *userHandler) GetMyAddress(c *fiber.Ctx) error {
 	var requestUser request.GetByUserIDRequest
+	var requestData request.AddressListRequest
 
 	authUser := c.Locals("authUser")
 	user, ok := authUser.(response.UserResponse)
@@ -110,7 +111,25 @@ func (h *userHandler) GetMyAddress(c *fiber.Ctx) error {
 
 	requestUser.ID = user.ID
 
-	myAddressResponse, err := h.userService.GetMyAddress(requestUser)
+	err := c.QueryParser(&requestData)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
+			Status: false,
+			Message: constants.FailedGetData,
+			Errors: []string{err.Error()},
+			Data: nil,
+		})
+	}
+
+	if requestData.Page <= 0 {
+		requestData.Page = 1
+	}
+
+	if requestData.Limit <= 0 {
+		requestData.Limit = 10
+	}
+
+	myAddressResponse, err := h.userService.GetMyAddress(requestUser, requestData)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.Response{
 			Status: false,
